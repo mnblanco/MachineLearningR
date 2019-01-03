@@ -1,0 +1,371 @@
+# Regression Methods
+
+```{r setup, include=FALSE}
+library(psych)
+library(rpart)
+#library(RWeka)
+library(rpart.plot)
+```
+
+## Part 1: Linear Regression
+
+Regression is concerned with specifying the relationship between a single numeric dependent variable (the value to be predicted) and one or more numeric independent variables (the predictors).
+
+Regression methods are also used for statistical hypothesis testing, which determines whether a premise is likely to be true or false in light of the observed data.
+
+- basic linear regression models—those that use straight lines with only a single independent variable known as simple linear regression.
+- the case of two or more independent variables, this is known as multiple linear regression, or simply "multiple regression". 
+- Both of these techniques assume that the dependent variable is measured on a continuous scale
+
+- logistic regression is used to model a binary categorical outcome
+- Poisson regression models integer count data
+- multinomial logistic regression models a categorical outcome
+
+## Understanding regression 
+
+## Example: Space Shuttle Launch Data 
+
+```{r}
+launch <- read.csv("Chapter 06/challenger.csv")
+```
+
+- estimate beta manually
+
+```{r}
+b <- cov(launch$temperature, launch$distress_ct) / var(launch$temperature)
+b
+```
+
+- estimate alpha manually
+
+```{r}
+a <- mean(launch$distress_ct) - b * mean(launch$temperature)
+a
+```
+
+- calculate the correlation of launch data
+
+```{r}
+r <- cov(launch$temperature, launch$distress_ct) /
+       (sd(launch$temperature) * sd(launch$distress_ct))
+r
+cor(launch$temperature, launch$distress_ct)
+```
+
+- computing the slope using correlation
+
+```{r}
+r * (sd(launch$distress_ct) / sd(launch$temperature))
+```
+
+- confirming the regression line using the lm function (not in text)
+
+```{r}
+model <- lm(distress_ct ~ temperature + field_check_pressure + flight_num, data = launch)
+model
+summary(model)
+```
+
+- creating a simple multiple regression function
+
+```{r}
+reg <- function(y, x) {
+  x <- as.matrix(x)
+  x <- cbind(Intercept = 1, x)
+  b <- solve(t(x) %*% x) %*% t(x) %*% y
+  colnames(b) <- "estimate"
+  print(b)
+}
+```
+
+- examine the launch data
+
+```{r}
+str(launch) 
+```
+
+- test regression model with simple linear regression
+
+```{r}
+reg(y = launch$distress_ct, x = launch[2])
+```
+
+- use regression model with multiple regression
+
+```{r}
+reg(y = launch$distress_ct, x = launch[2:4])
+```
+
+- confirming the multiple regression result using the lm function (not in text)
+
+```{r}
+model <- lm(distress_ct ~ temperature + field_check_pressure, data = launch)
+model
+```
+
+## Example: Predicting Medical Expenses 
+
+### Step 1: collecting data
+
+The insurance.csv file includes 1,338 examples of beneficiaries currently enrolled in the insurance plan, with features indicating characteristics of the patient as well as the total medical expenses charged to the plan for the calendar year. The features are:
+
+age: An integer indicating the age of the primary beneficiary (excluding those above 64 years, since they are generally covered by the government).
+
+sex: The policy holder's gender, either male or female.
+
+bmi: The body mass index (BMI), which provides a sense of how over- or under-weight a person is relative to their height. BMI is equal to weight (in kilograms) divided by height (in meters) squared. An ideal BMI is within the range of 18.5 to 24.9.
+
+children: An integer indicating the number of children/dependents covered by the insurance plan.
+
+smoker: A yes or no categorical variable that indicates whether the insured regularly smokes tobacco.
+
+region: The beneficiary's place of residence in the US, divided into four geographic regions: northeast, southeast, southwest, or northwest.
+
+### Step 2: Exploring and preparing the data 
+
+```{r}
+insurance <- read.csv("Chapter 06/insurance.csv")
+str(insurance)
+```
+
+- summarize the charges variable
+
+```{r}
+summary(insurance$expenses)
+```
+
+- histogram of insurance charges
+
+```{r}
+hist(insurance$expenses)
+```
+
+- table of region
+
+```{r}
+table(insurance$region)
+```
+
+- exploring relationships among features: correlation matrix
+
+```{r}
+cor(insurance[c("age", "bmi", "children", "expenses")])
+```
+
+- visualing relationships among features: scatterplot matrix
+
+```{r}
+pairs(insurance[c("age", "bmi", "children", "expenses")])
+```
+
+- more informative scatterplot matrix
+
+```{r}
+pairs.panels(insurance[c("age", "bmi", "children", "expenses")])
+```
+
+### Step 3: Training a model on the data 
+
+```{r}
+ins_model <- lm(expenses ~ age + children + bmi + sex + smoker + region,
+                data = insurance)
+ins_model <- lm(expenses ~ ., data = insurance) # this is equivalent to above
+```
+
+- see the estimated beta coefficients
+
+```{r}
+ins_model
+```
+
+### Step 4: Evaluating model performance 
+
+- see more detail about the estimated beta coefficients
+
+```{r}
+summary(ins_model)
+```
+
+### Step 5: Improving model performance 
+
+- add a higher-order "age" term
+
+```{r}
+insurance$age2 <- insurance$age^2
+```
+
+- add an indicator for BMI >= 30
+
+```{r}
+insurance$bmi30 <- ifelse(insurance$bmi >= 30, 1, 0)
+```
+
+- create final model
+
+```{r}
+ins_model2 <- lm(expenses ~ age + age2 + children + bmi + sex +
+                   bmi30*smoker + region, data = insurance)
+
+summary(ins_model2)
+```
+
+## Part 2: Regression Trees and Model Trees
+
+nown as regression trees, were introduced in the 1980s as part of the seminal Classification and Regression Tree (CART) algorithm. Despite the name, regression trees do not use linear regression methods as described earlier in this chapter, rather they make predictions based on the average value of examples that reach a leaf.
+
+## Understanding regression trees and model trees 
+
+## Example: Calculating SDR 
+
+- set up the data
+
+```{r}
+tee <- c(1, 1, 1, 2, 2, 3, 4, 5, 5, 6, 6, 7, 7, 7, 7)
+at1 <- c(1, 1, 1, 2, 2, 3, 4, 5, 5)
+at2 <- c(6, 6, 7, 7, 7, 7)
+bt1 <- c(1, 1, 1, 2, 2, 3, 4)
+bt2 <- c(5, 5, 6, 6, 7, 7, 7, 7)
+```
+
+- compute the SDR
+
+```{r}
+sdr_a <- sd(tee) - (length(at1) / length(tee) * sd(at1) + length(at2) / length(tee) * sd(at2))
+sdr_b <- sd(tee) - (length(bt1) / length(tee) * sd(bt1) + length(bt2) / length(tee) * sd(bt2))
+```
+
+- compare the SDR for each split
+
+```{r}
+sdr_a
+sdr_b
+```
+
+## Example: Estimating Wine Quality 
+
+### Step 2: Exploring and preparing the data 
+
+```{r}
+wine <- read.csv("Chapter 06/whitewines.csv")
+```
+
+- examine the wine data
+
+```{r}
+str(wine)
+```
+
+- the distribution of quality ratings
+
+```{r}
+hist(wine$quality)
+```
+
+- summary statistics of the wine data
+
+```{r}
+summary(wine)
+
+wine_train <- wine[1:3750, ]
+wine_test <- wine[3751:4898, ]
+```
+
+### Step 3: Training a model on the data 
+
+- regression tree using rpart
+
+```{r}
+m.rpart <- rpart(quality ~ ., data = wine_train)
+```
+
+- get basic information about the tree
+
+```{r}
+m.rpart
+```
+
+- get more detailed information about the tree
+
+```{r}
+summary(m.rpart)
+```
+
+- a basic decision tree diagram
+
+```{r}
+rpart.plot(m.rpart, digits = 3)
+```
+
+- a few adjustments to the diagram
+
+```{r}
+rpart.plot(m.rpart, digits = 4, fallen.leaves = TRUE, type = 3, extra = 101)
+```
+
+### Step 4: Evaluate model performance 
+
+- generate predictions for the testing dataset
+
+```{r}
+p.rpart <- predict(m.rpart, wine_test)
+```
+
+- compare the distribution of predicted values vs. actual values
+
+```{r}
+summary(p.rpart)
+summary(wine_test$quality)
+```
+
+- compare the correlation
+
+```{r}
+cor(p.rpart, wine_test$quality)
+```
+
+- function to calculate the mean absolute error
+
+```{r}
+MAE <- function(actual, predicted) {
+  mean(abs(actual - predicted))  
+}
+```
+
+- mean absolute error between predicted and actual values
+
+```{r}
+MAE(p.rpart, wine_test$quality)
+```
+
+- mean absolute error between actual values and mean value
+
+```{r}
+mean(wine_train$quality) # result = 5.87
+MAE(5.87, wine_test$quality)
+```
+
+### Step 5: Improving model performance 
+
+```{r}
+# # train a M5' Model Tree
+# m.m5p <- M5P(quality ~ ., data = wine_train)
+# 
+# # display the tree
+# m.m5p
+# 
+# # get a summary of the model's performance
+# summary(m.m5p)
+# 
+# # generate predictions for the model
+# p.m5p <- predict(m.m5p, wine_test)
+# 
+# # summary statistics about the predictions
+# summary(p.m5p)
+# 
+# # correlation between the predicted and true values
+# cor(p.m5p, wine_test$quality)
+# 
+# # mean absolute error of predicted and true values
+# # (uses a custom function defined above)
+# MAE(wine_test$quality, p.m5p)
+```

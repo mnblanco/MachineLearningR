@@ -1,0 +1,23 @@
+output_dir: "docs"
+new_session: yes
+
+rmd_files:
+  - "index.Rmd"
+  - "Chapter01.Rmd"
+  - "Chapter02.Rmd"
+  - "Chapter03.Rmd"
+  - "Chapter04.Rmd"
+  - "Chapter05.Rmd"
+  - "Chapter06.Rmd"
+  - "Chapter07.Rmd"
+  - "Chapter08.Rmd"
+  - "Chapter09.Rmd"
+  - "Chapter10.Rmd"
+  
+book_filename: "mlr"
+language:
+  ui:
+    chapter_name: "Chapter "
+
+delete_merged_file: true
+edit: "https://github.com/mnblanco/MLR/edit/master/%s"

@@ -1,0 +1,294 @@
+# Evaluating Model Performance
+
+```{r setup, include=FALSE}
+library(caret)
+library(C50)
+library(irr)
+library(gmodels)
+library(vcd)
+library(ROCR)
+library(tm)
+library(e1071)
+```
+
+```{r}
+sms_raw <- read.csv("Chapter 04/sms_spam.csv")
+sms_raw$type <- factor(sms_raw$type)
+
+sms_corpus <- VCorpus(VectorSource(sms_raw$text))
+
+sms_corpus_clean <- tm_map(sms_corpus, content_transformer(tolower))
+sms_corpus_clean <- tm_map(sms_corpus_clean, removeNumbers) # remove numbers
+sms_corpus_clean <- tm_map(sms_corpus_clean, removeWords, stopwords()) # remove stop words
+sms_corpus_clean <- tm_map(sms_corpus_clean, removePunctuation) # remove punctuation
+
+replacePunctuation <- function(x) { gsub("[[:punct:]]+", " ", x) }
+
+sms_corpus_clean <- tm_map(sms_corpus_clean, stemDocument)
+sms_corpus_clean <- tm_map(sms_corpus_clean, stripWhitespace) # eliminate unneeded whitespace
+
+lapply(sms_corpus[1:3], as.character)
+lapply(sms_corpus_clean[1:3], as.character)
+
+sms_dtm <- DocumentTermMatrix(sms_corpus_clean)
+
+sms_dtm_train <- sms_dtm[1:4169, ]
+sms_dtm_test  <- sms_dtm[4170:5559, ]
+
+sms_train_labels <- sms_raw[1:4169, ]$type
+sms_test_labels  <- sms_raw[4170:5559, ]$type
+
+sms_freq_words <- findFreqTerms(sms_dtm_train, 5)
+
+sms_dtm_freq_train <- sms_dtm_train[ , sms_freq_words]
+sms_dtm_freq_test <- sms_dtm_test[ , sms_freq_words]
+convert_counts <- function(x) {
+  x <- ifelse(x > 0, "Yes", "No")
+}
+sms_train <- apply(sms_dtm_freq_train, MARGIN = 2, convert_counts)
+sms_test  <- apply(sms_dtm_freq_test, MARGIN = 2, convert_counts)
+sms_classifier <- naiveBayes(sms_train, sms_train_labels)
+
+sms_test_pred <- predict(sms_classifier, sms_test)
+```
+
+- obtain the predicted probabilities
+
+```{r}
+sms_test_prob <- predict(sms_classifier, sms_test, type = "raw")
+head(sms_test_prob)
+```
+
+- combine the results into a data frame
+
+```{r}
+sms_results <- data.frame(actual_type = sms_test_labels,
+                          predict_type = sms_test_pred,
+                          prob_spam = round(sms_test_prob[ , 2], 5),
+                          prob_ham = round(sms_test_prob[ , 1], 5))
+```
+
+- uncomment this line to output the sms_results to CSV
+
+```{r}
+write.csv(sms_results, "Chapter 10/sms_results.csv", row.names = FALSE)
+```
+
+## Confusion matrixes in R
+
+```{r}
+sms_results <- read.csv("Chapter 10/sms_results.csv")
+```
+
+- the first several test cases
+
+```{r}
+head(sms_results)
+```
+
+- test cases where the model is less confident
+
+```{r}
+head(subset(sms_results, prob_spam > 0.40 & prob_spam < 0.60))
+```
+
+- test cases where the model was wrong
+
+```{r}
+head(subset(sms_results, actual_type != predict_type))
+```
+
+- specifying vectors
+
+```{r}
+table(sms_results$actual_type, sms_results$predict_type)
+```
+
+- alternative solution using the formula interface (not shown in book)
+
+```{r}
+xtabs(~ actual_type + predict_type, sms_results)
+```
+
+- using the CrossTable function
+
+```{r}
+CrossTable(sms_results$actual_type, sms_results$predict_type)
+```
+
+- accuracy and error rate calculation
+- accuracy
+
+```{r}
+(152 + 1203) / (152 + 1203 + 4 + 31)
+```
+
+- error rate
+
+```{r}
+(4 + 31) / (152 + 1203 + 4 + 31)
+```
+
+- error rate = 1 - accuracy
+
+```{r}
+1 - 0.9748201
+```
+
+## Beyond accuracy: other performance measures
+
+```{r}
+confusionMatrix(sms_results$predict_type, sms_results$actual_type, positive = "spam")
+```
+
+- Kappa statistic
+- example using SMS classifier
+
+```{r}
+pr_a <- 0.865 + 0.109
+pr_a
+
+pr_e <- 0.868 * 0.888 + 0.132 * 0.112
+pr_e
+
+k <- (pr_a - pr_e) / (1 - pr_e)
+k
+```
+
+- calculate kappa via the vcd package
+
+```{r}
+Kappa(table(sms_results$actual_type, sms_results$predict_type))
+```
+
+- calculate kappa via the irr package
+
+```{r}
+kappa2(sms_results[1:2])
+```
+
+- Sensitivity and specificity
+- example using SMS classifier
+
+```{r}
+sens <- 152 / (152 + 31)
+sens
+
+spec <- 1203 / (1203 + 4)
+spec
+```
+
+- example using the caret package
+
+```{r}
+sensitivity(sms_results$predict_type, sms_results$actual_type, positive = "spam")
+specificity(sms_results$predict_type, sms_results$actual_type, negative = "ham")
+```
+
+- Precision and recall
+
+```{r}
+prec <- 152 / (152 + 4)
+prec
+
+rec <- 152 / (152 + 31)
+rec
+```
+
+- example using the caret package
+
+```{r}
+posPredValue(sms_results$predict_type, sms_results$actual_type, positive = "spam")
+sensitivity(sms_results$predict_type, sms_results$actual_type, positive = "spam")
+```
+
+- F-measure
+
+```{r}
+f <- (2 * prec * rec) / (prec + rec)
+f
+
+f <- (2 * 152) / (2 * 152 + 4 + 31)
+f
+```
+
+## Visualizing Performance Tradeoffs
+
+```{r}
+pred <- prediction(predictions = sms_results$prob_spam,
+                   labels = sms_results$actual_type)
+```
+
+- ROC curves
+- add a reference line to the graph
+
+```{r}
+perf <- performance(pred, measure = "tpr", x.measure = "fpr")
+plot(perf, main = "ROC curve for SMS spam filter", col = "blue", lwd = 2)
+abline(a = 0, b = 1, lwd = 2, lty = 2)
+```
+
+- calculate AUC
+
+```{r}
+perf.auc <- performance(pred, measure = "auc")
+str(perf.auc)
+unlist(perf.auc@y.values)
+```
+
+## Estimating Future Performance
+
+- partitioning data
+
+```{r}
+credit <- read.csv("Chapter 10/credit.csv")
+```
+
+- Holdout method
+- using random IDs
+
+```{r}
+random_ids <- order(runif(1000))
+credit_train <- credit[random_ids[1:500],]
+credit_validate <- credit[random_ids[501:750], ]
+credit_test <- credit[random_ids[751:1000], ]
+```
+
+- using caret function
+
+```{r}
+in_train <- createDataPartition(credit$default, p = 0.75, list = FALSE)
+credit_train <- credit[in_train, ]
+credit_test <- credit[-in_train, ]
+```
+
+- 10-fold CV
+
+```{r}
+folds <- createFolds(credit$default, k = 10)
+str(folds)
+credit01_test <- credit[folds$Fold01, ]
+credit01_train <- credit[-folds$Fold01, ]
+```
+
+- Automating 10-fold CV for a C5.0 Decision Tree using lapply
+
+```{r}
+credit <- read.csv("Chapter 10/credit.csv")
+
+set.seed(123)
+folds <- createFolds(credit$default, k = 10)
+
+cv_results <- lapply(folds, function(x) {
+  credit_train <- credit[-x, ]
+  credit_test <- credit[x, ]
+  credit_model <- C5.0(default ~ ., data = credit_train)
+  credit_pred <- predict(credit_model, credit_test)
+  credit_actual <- credit_test$default
+  kappa <- kappa2(data.frame(credit_actual, credit_pred))$value
+  return(kappa)
+})
+
+str(cv_results)
+mean(unlist(cv_results))
+```

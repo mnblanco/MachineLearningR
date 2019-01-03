@@ -1,0 +1,135 @@
+# Clustering with k-means
+
+## k-means
+
+## Example: Finding Teen Market Segments
+
+### Step 2: Exploring and preparing the data
+
+```{r}
+teens <- read.csv("Chapter 09/snsdata.csv")
+str(teens)
+```
+
+- look at missing data for female variable
+
+```{r}
+table(teens$gender)
+table(teens$gender, useNA = "ifany")
+```
+
+- look at missing data for age variable
+
+```{r}
+summary(teens$age)
+```
+
+- eliminate age outliers
+
+```{r}
+teens$age <- ifelse(teens$age >= 13 & teens$age < 20,
+                     teens$age, NA)
+
+summary(teens$age)
+```
+
+- reassign missing gender values to "unknown"
+
+```{r}
+teens$female <- ifelse(teens$gender == "F" &
+                         !is.na(teens$gender), 1, 0)
+teens$no_gender <- ifelse(is.na(teens$gender), 1, 0)
+```
+
+- check our recoding work
+
+```{r}
+table(teens$gender, useNA = "ifany")
+table(teens$female, useNA = "ifany")
+table(teens$no_gender, useNA = "ifany")
+```
+
+- finding the mean age by cohort
+
+```{r}
+mean(teens$age) # doesn't work
+mean(teens$age, na.rm = TRUE) # works
+```
+
+- age by cohort
+
+```{r}
+aggregate(data = teens, age ~ gradyear, mean, na.rm = TRUE)
+```
+
+- create a vector with the average age for each gradyear, repeated by person
+
+```{r}
+ave_age <- ave(teens$age, teens$gradyear,
+                 FUN = function(x) mean(x, na.rm = TRUE))
+
+
+teens$age <- ifelse(is.na(teens$age), ave_age, teens$age)
+```
+
+- check the summary results to ensure missing values are eliminated
+
+```{r}
+summary(teens$age)
+```
+
+### Step 3: Training a model on the data
+
+```{r}
+interests <- teens[5:40]
+interests_z <- as.data.frame(lapply(interests, scale))
+
+set.seed(2345)
+teen_clusters <- kmeans(interests_z, 5)
+```
+
+### Step 4: Evaluating model performance
+
+- look at the size of the clusters
+
+```{r}
+teen_clusters$size
+```
+
+- look at the cluster centers
+
+```{r}
+teen_clusters$centers
+```
+
+### Step 5: Improving model performance
+
+- apply the cluster IDs to the original data frame
+
+```{r}
+teens$cluster <- teen_clusters$cluster
+```
+
+- look at the first five records
+
+```{r}
+teens[1:5, c("cluster", "gender", "age", "friends")]
+```
+
+- mean age by cluster
+
+```{r}
+aggregate(data = teens, age ~ cluster, mean)
+```
+
+- proportion of females by cluster
+
+```{r}
+aggregate(data = teens, female ~ cluster, mean)
+```
+
+- mean number of friends by cluster
+
+```{r}
+aggregate(data = teens, friends ~ cluster, mean)
+```
