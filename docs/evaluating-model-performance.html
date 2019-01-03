@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 10 Evaluating Model Performance | Machine Learning with R Solutions</title>
+  <meta name="description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz.">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 10 Evaluating Model Performance | Machine Learning with R Solutions" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 10 Evaluating Model Performance | Machine Learning with R Solutions" />
+  
+  <meta name="twitter:description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz." />
+  
+
+<meta name="author" content="Marjorie Blanco">
+
+
+<meta name="date" content="2019-01-02">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="clustering-with-k-means.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Machine Learning with R Solution</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome</a></li>
+<li class="chapter" data-level="1" data-path="introducing-machine-learning.html"><a href="introducing-machine-learning.html"><i class="fa fa-check"></i><b>1</b> Introducing Machine Learning</a></li>
+<li class="chapter" data-level="2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html"><i class="fa fa-check"></i><b>2</b> Managing and Understanding Data</a><ul>
+<li class="chapter" data-level="2.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#r-data-structures"><i class="fa fa-check"></i><b>2.1</b> R data structures</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#vectors"><i class="fa fa-check"></i><b>2.1.1</b> Vectors</a></li>
+<li class="chapter" data-level="2.1.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#factors"><i class="fa fa-check"></i><b>2.1.2</b> Factors</a></li>
+<li class="chapter" data-level="2.1.3" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#lists"><i class="fa fa-check"></i><b>2.1.3</b> Lists</a></li>
+<li class="chapter" data-level="2.1.4" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#data-frames"><i class="fa fa-check"></i><b>2.1.4</b> Data frames</a></li>
+<li class="chapter" data-level="2.1.5" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#matrixes"><i class="fa fa-check"></i><b>2.1.5</b> Matrixes</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#managing-data-with-r"><i class="fa fa-check"></i><b>2.2</b> Managing data with R</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#saving-loading-and-removing-r-data-structures"><i class="fa fa-check"></i><b>2.2.1</b> saving, loading, and removing R data structures</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-and-understanding-data"><i class="fa fa-check"></i><b>2.3</b> Exploring and understanding data</a></li>
+<li class="chapter" data-level="2.4" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#data-exploration-example-using-used-car-data"><i class="fa fa-check"></i><b>2.4</b> data exploration example using used car data</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-the-structure-of-data"><i class="fa fa-check"></i><b>2.4.1</b> Exploring the structure of data</a></li>
+<li class="chapter" data-level="2.4.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-numeric-variables"><i class="fa fa-check"></i><b>2.4.2</b> Exploring numeric variables</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-categorical-variables"><i class="fa fa-check"></i><b>2.5</b> Exploring categorical variables</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-relationships-between-variables"><i class="fa fa-check"></i><b>2.5.1</b> Exploring relationships between variables</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html"><i class="fa fa-check"></i><b>3</b> Classification using Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#lazy-learning"><i class="fa fa-check"></i><b>3.1</b> Lazy Learning</a></li>
+<li class="chapter" data-level="3.2" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#example-classifying-cancer-samples"><i class="fa fa-check"></i><b>3.2</b> Example: Classifying Cancer Samples</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-1-collecting-data"><i class="fa fa-check"></i><b>3.2.1</b> Step 1: collecting data</a></li>
+<li class="chapter" data-level="3.2.2" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-2-exploring-and-preparing-the-data"><i class="fa fa-check"></i><b>3.2.2</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="3.2.3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-3-training-a-model-on-the-data"><i class="fa fa-check"></i><b>3.2.3</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="3.2.4" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-4-evaluating-model-performance"><i class="fa fa-check"></i><b>3.2.4</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="3.2.5" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-5-improving-model-performance"><i class="fa fa-check"></i><b>3.2.5</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#summary"><i class="fa fa-check"></i><b>3.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html"><i class="fa fa-check"></i><b>4</b> Classification using Naive Bayes</a><ul>
+<li class="chapter" data-level="4.1" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#naive-bayes"><i class="fa fa-check"></i><b>4.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="4.2" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#example-filtering-spam-sms-messages"><i class="fa fa-check"></i><b>4.2</b> Example: Filtering spam SMS messages</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-2-exploring-and-preparing-the-data-1"><i class="fa fa-check"></i><b>4.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="4.2.2" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-3-training-a-model-on-the-data-1"><i class="fa fa-check"></i><b>4.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="4.2.3" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-4-evaluating-model-performance-1"><i class="fa fa-check"></i><b>4.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="4.2.4" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-5-improving-model-performance-1"><i class="fa fa-check"></i><b>4.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#summary-1"><i class="fa fa-check"></i><b>4.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html"><i class="fa fa-check"></i><b>5</b> Classification using Decision Trees and Rules</a><ul>
+<li class="chapter" data-level="5.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#part-1-decision-trees"><i class="fa fa-check"></i><b>5.1</b> Part 1: Decision Trees</a></li>
+<li class="chapter" data-level="5.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#understanding-decision-trees"><i class="fa fa-check"></i><b>5.2</b> Understanding Decision Trees</a></li>
+<li class="chapter" data-level="5.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#example-identifying-risky-bank-loans"><i class="fa fa-check"></i><b>5.3</b> Example: Identifying Risky Bank Loans</a><ul>
+<li class="chapter" data-level="5.3.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-2-exploring-and-preparing-the-data-2"><i class="fa fa-check"></i><b>5.3.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="5.3.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-3-training-a-model-on-the-data-2"><i class="fa fa-check"></i><b>5.3.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="5.3.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-4-evaluating-model-performance-2"><i class="fa fa-check"></i><b>5.3.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="5.3.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-5-improving-model-performance-2"><i class="fa fa-check"></i><b>5.3.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#boosting-the-accuracy-of-decision-trees"><i class="fa fa-check"></i><b>5.4</b> Boosting the accuracy of decision trees</a></li>
+<li class="chapter" data-level="5.5" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#making-some-mistakes-more-costly-than-others"><i class="fa fa-check"></i><b>5.5</b> Making some mistakes more costly than others</a></li>
+<li class="chapter" data-level="5.6" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#part-2-rule-learners"><i class="fa fa-check"></i><b>5.6</b> Part 2: Rule Learners</a></li>
+<li class="chapter" data-level="5.7" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#example-identifying-poisonous-mushrooms"><i class="fa fa-check"></i><b>5.7</b> Example: Identifying Poisonous Mushrooms</a><ul>
+<li class="chapter" data-level="5.7.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-2-exploring-and-preparing-the-data-3"><i class="fa fa-check"></i><b>5.7.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="5.7.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-3-training-a-model-on-the-data-3"><i class="fa fa-check"></i><b>5.7.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="5.7.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-4-evaluating-model-performance-3"><i class="fa fa-check"></i><b>5.7.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="5.7.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-5-improving-model-performance-3"><i class="fa fa-check"></i><b>5.7.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.8" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#summary-2"><i class="fa fa-check"></i><b>5.8</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="regression-methods.html"><a href="regression-methods.html"><i class="fa fa-check"></i><b>6</b> Regression Methods</a><ul>
+<li class="chapter" data-level="6.1" data-path="regression-methods.html"><a href="regression-methods.html#part-1-linear-regression"><i class="fa fa-check"></i><b>6.1</b> Part 1: Linear Regression</a></li>
+<li class="chapter" data-level="6.2" data-path="regression-methods.html"><a href="regression-methods.html#understanding-regression"><i class="fa fa-check"></i><b>6.2</b> Understanding regression</a></li>
+<li class="chapter" data-level="6.3" data-path="regression-methods.html"><a href="regression-methods.html#example-space-shuttle-launch-data"><i class="fa fa-check"></i><b>6.3</b> Example: Space Shuttle Launch Data</a></li>
+<li class="chapter" data-level="6.4" data-path="regression-methods.html"><a href="regression-methods.html#example-predicting-medical-expenses"><i class="fa fa-check"></i><b>6.4</b> Example: Predicting Medical Expenses</a><ul>
+<li class="chapter" data-level="6.4.1" data-path="regression-methods.html"><a href="regression-methods.html#step-1-collecting-data-1"><i class="fa fa-check"></i><b>6.4.1</b> Step 1: collecting data</a></li>
+<li class="chapter" data-level="6.4.2" data-path="regression-methods.html"><a href="regression-methods.html#step-2-exploring-and-preparing-the-data-4"><i class="fa fa-check"></i><b>6.4.2</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="6.4.3" data-path="regression-methods.html"><a href="regression-methods.html#step-3-training-a-model-on-the-data-4"><i class="fa fa-check"></i><b>6.4.3</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="6.4.4" data-path="regression-methods.html"><a href="regression-methods.html#step-4-evaluating-model-performance-4"><i class="fa fa-check"></i><b>6.4.4</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="6.4.5" data-path="regression-methods.html"><a href="regression-methods.html#step-5-improving-model-performance-4"><i class="fa fa-check"></i><b>6.4.5</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="regression-methods.html"><a href="regression-methods.html#part-2-regression-trees-and-model-trees"><i class="fa fa-check"></i><b>6.5</b> Part 2: Regression Trees and Model Trees</a></li>
+<li class="chapter" data-level="6.6" data-path="regression-methods.html"><a href="regression-methods.html#understanding-regression-trees-and-model-trees"><i class="fa fa-check"></i><b>6.6</b> Understanding regression trees and model trees</a></li>
+<li class="chapter" data-level="6.7" data-path="regression-methods.html"><a href="regression-methods.html#example-calculating-sdr"><i class="fa fa-check"></i><b>6.7</b> Example: Calculating SDR</a></li>
+<li class="chapter" data-level="6.8" data-path="regression-methods.html"><a href="regression-methods.html#example-estimating-wine-quality"><i class="fa fa-check"></i><b>6.8</b> Example: Estimating Wine Quality</a><ul>
+<li class="chapter" data-level="6.8.1" data-path="regression-methods.html"><a href="regression-methods.html#step-2-exploring-and-preparing-the-data-5"><i class="fa fa-check"></i><b>6.8.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="6.8.2" data-path="regression-methods.html"><a href="regression-methods.html#step-3-training-a-model-on-the-data-5"><i class="fa fa-check"></i><b>6.8.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="6.8.3" data-path="regression-methods.html"><a href="regression-methods.html#step-4-evaluate-model-performance"><i class="fa fa-check"></i><b>6.8.3</b> Step 4: Evaluate model performance</a></li>
+<li class="chapter" data-level="6.8.4" data-path="regression-methods.html"><a href="regression-methods.html#step-5-improving-model-performance-5"><i class="fa fa-check"></i><b>6.8.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html"><i class="fa fa-check"></i><b>7</b> Neural Networks and Support Vector Machines</a><ul>
+<li class="chapter" data-level="7.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#part-1-neural-networks"><i class="fa fa-check"></i><b>7.1</b> Part 1: Neural Networks</a></li>
+<li class="chapter" data-level="7.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#example-modeling-the-strength-of-concrete"><i class="fa fa-check"></i><b>7.2</b> Example: Modeling the Strength of Concrete</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-2-exploring-and-preparing-the-data-6"><i class="fa fa-check"></i><b>7.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="7.2.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-3-training-a-model-on-the-data-6"><i class="fa fa-check"></i><b>7.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="7.2.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-4-evaluating-model-performance-5"><i class="fa fa-check"></i><b>7.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="7.2.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-5-improving-model-performance-6"><i class="fa fa-check"></i><b>7.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#part-2-support-vector-machines"><i class="fa fa-check"></i><b>7.3</b> Part 2: Support Vector Machines</a></li>
+<li class="chapter" data-level="7.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#example-optical-character-recognition"><i class="fa fa-check"></i><b>7.4</b> Example: Optical Character Recognition</a><ul>
+<li class="chapter" data-level="7.4.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-2-exploring-and-preparing-the-data-7"><i class="fa fa-check"></i><b>7.4.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="7.4.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-3-training-a-model-on-the-data-7"><i class="fa fa-check"></i><b>7.4.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="7.4.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-4-evaluating-model-performance-6"><i class="fa fa-check"></i><b>7.4.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="7.4.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-5-improving-model-performance-7"><i class="fa fa-check"></i><b>7.4.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rules.html"><a href="association-rules.html"><i class="fa fa-check"></i><b>8</b> Association Rules</a><ul>
+<li class="chapter" data-level="8.1" data-path="association-rules.html"><a href="association-rules.html#market-basket-analysis"><i class="fa fa-check"></i><b>8.1</b> Market Basket Analysis</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rules.html"><a href="association-rules.html#example-identifying-frequently-purchased-groceries"><i class="fa fa-check"></i><b>8.2</b> Example: Identifying Frequently-Purchased Groceries</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="association-rules.html"><a href="association-rules.html#step-2-exploring-and-preparing-the-data-8"><i class="fa fa-check"></i><b>8.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="8.2.2" data-path="association-rules.html"><a href="association-rules.html#step-3-training-a-model-on-the-data-8"><i class="fa fa-check"></i><b>8.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="8.2.3" data-path="association-rules.html"><a href="association-rules.html#step-4-evaluating-model-performance-7"><i class="fa fa-check"></i><b>8.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="8.2.4" data-path="association-rules.html"><a href="association-rules.html#step-5-improving-model-performance-8"><i class="fa fa-check"></i><b>8.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html"><i class="fa fa-check"></i><b>9</b> Clustering with k-means</a><ul>
+<li class="chapter" data-level="9.1" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#k-means"><i class="fa fa-check"></i><b>9.1</b> k-means</a></li>
+<li class="chapter" data-level="9.2" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#example-finding-teen-market-segments"><i class="fa fa-check"></i><b>9.2</b> Example: Finding Teen Market Segments</a><ul>
+<li class="chapter" data-level="9.2.1" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-2-exploring-and-preparing-the-data-9"><i class="fa fa-check"></i><b>9.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="9.2.2" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-3-training-a-model-on-the-data-9"><i class="fa fa-check"></i><b>9.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="9.2.3" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-4-evaluating-model-performance-8"><i class="fa fa-check"></i><b>9.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="9.2.4" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-5-improving-model-performance-9"><i class="fa fa-check"></i><b>9.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html"><i class="fa fa-check"></i><b>10</b> Evaluating Model Performance</a><ul>
+<li class="chapter" data-level="10.1" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#confusion-matrixes-in-r"><i class="fa fa-check"></i><b>10.1</b> Confusion matrixes in R</a></li>
+<li class="chapter" data-level="10.2" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#beyond-accuracy-other-performance-measures"><i class="fa fa-check"></i><b>10.2</b> Beyond accuracy: other performance measures</a></li>
+<li class="chapter" data-level="10.3" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#visualizing-performance-tradeoffs"><i class="fa fa-check"></i><b>10.3</b> Visualizing Performance Tradeoffs</a></li>
+<li class="chapter" data-level="10.4" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#estimating-future-performance"><i class="fa fa-check"></i><b>10.4</b> Estimating Future Performance</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/mnblanco/MLR" target="blank">Machine Learning with R Solution</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Machine Learning with R Solutions</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="evaluating-model-performance" class="section level1">
+<h1><span class="header-section-number">Chapter 10</span> Evaluating Model Performance</h1>
+<pre class="sourceCode r"><code class="sourceCode r">sms_raw &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;Chapter 04/sms_spam.csv&quot;</span>)
+sms_raw<span class="op">$</span>type &lt;-<span class="st"> </span><span class="kw">factor</span>(sms_raw<span class="op">$</span>type)
+
+sms_corpus &lt;-<span class="st"> </span><span class="kw">VCorpus</span>(<span class="kw">VectorSource</span>(sms_raw<span class="op">$</span>text))
+
+sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus, <span class="kw">content_transformer</span>(tolower))
+sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus_clean, removeNumbers) <span class="co"># remove numbers</span>
+sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus_clean, removeWords, <span class="kw">stopwords</span>()) <span class="co"># remove stop words</span>
+sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus_clean, removePunctuation) <span class="co"># remove punctuation</span>
+
+replacePunctuation &lt;-<span class="st"> </span><span class="cf">function</span>(x) { <span class="kw">gsub</span>(<span class="st">&quot;[[:punct:]]+&quot;</span>, <span class="st">&quot; &quot;</span>, x) }
+
+sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus_clean, stemDocument)
+sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus_clean, stripWhitespace) <span class="co"># eliminate unneeded whitespace</span>
+
+<span class="kw">lapply</span>(sms_corpus[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>], as.character)</code></pre>
+<pre><code>## $`1`
+## [1] &quot;Hope you are having a good week. Just checking in&quot;
+## 
+## $`2`
+## [1] &quot;K..give back my thanks.&quot;
+## 
+## $`3`
+## [1] &quot;Am also doing in cbe only. But have to pay.&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(sms_corpus_clean[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>], as.character)</code></pre>
+<pre><code>## $`1`
+## [1] &quot;hope good week just check&quot;
+## 
+## $`2`
+## [1] &quot;kgive back thank&quot;
+## 
+## $`3`
+## [1] &quot;also cbe pay&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">sms_dtm &lt;-<span class="st"> </span><span class="kw">DocumentTermMatrix</span>(sms_corpus_clean)
+
+sms_dtm_train &lt;-<span class="st"> </span>sms_dtm[<span class="dv">1</span><span class="op">:</span><span class="dv">4169</span>, ]
+sms_dtm_test  &lt;-<span class="st"> </span>sms_dtm[<span class="dv">4170</span><span class="op">:</span><span class="dv">5559</span>, ]
+
+sms_train_labels &lt;-<span class="st"> </span>sms_raw[<span class="dv">1</span><span class="op">:</span><span class="dv">4169</span>, ]<span class="op">$</span>type
+sms_test_labels  &lt;-<span class="st"> </span>sms_raw[<span class="dv">4170</span><span class="op">:</span><span class="dv">5559</span>, ]<span class="op">$</span>type
+
+sms_freq_words &lt;-<span class="st"> </span><span class="kw">findFreqTerms</span>(sms_dtm_train, <span class="dv">5</span>)
+
+sms_dtm_freq_train &lt;-<span class="st"> </span>sms_dtm_train[ , sms_freq_words]
+sms_dtm_freq_test &lt;-<span class="st"> </span>sms_dtm_test[ , sms_freq_words]
+convert_counts &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
+  x &lt;-<span class="st"> </span><span class="kw">ifelse</span>(x <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>)
+}
+sms_train &lt;-<span class="st"> </span><span class="kw">apply</span>(sms_dtm_freq_train, <span class="dt">MARGIN =</span> <span class="dv">2</span>, convert_counts)
+sms_test  &lt;-<span class="st"> </span><span class="kw">apply</span>(sms_dtm_freq_test, <span class="dt">MARGIN =</span> <span class="dv">2</span>, convert_counts)
+sms_classifier &lt;-<span class="st"> </span><span class="kw">naiveBayes</span>(sms_train, sms_train_labels)
+
+sms_test_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(sms_classifier, sms_test)</code></pre>
+<ul>
+<li>obtain the predicted probabilities</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_test_prob &lt;-<span class="st"> </span><span class="kw">predict</span>(sms_classifier, sms_test, <span class="dt">type =</span> <span class="st">&quot;raw&quot;</span>)
+<span class="kw">head</span>(sms_test_prob)</code></pre>
+<pre><code>##               ham         spam
+## [1,] 9.999996e-01 4.018928e-07
+## [2,] 9.999921e-01 7.852061e-06
+## [3,] 9.998548e-01 1.452211e-04
+## [4,] 9.999612e-01 3.875736e-05
+## [5,] 4.293821e-10 1.000000e+00
+## [6,] 9.998511e-01 1.489135e-04</code></pre>
+<ul>
+<li>combine the results into a data frame</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_results &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">actual_type =</span> sms_test_labels,
+                          <span class="dt">predict_type =</span> sms_test_pred,
+                          <span class="dt">prob_spam =</span> <span class="kw">round</span>(sms_test_prob[ , <span class="dv">2</span>], <span class="dv">5</span>),
+                          <span class="dt">prob_ham =</span> <span class="kw">round</span>(sms_test_prob[ , <span class="dv">1</span>], <span class="dv">5</span>))</code></pre>
+<ul>
+<li>uncomment this line to output the sms_results to CSV</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">write.csv</span>(sms_results, <span class="st">&quot;Chapter 10/sms_results.csv&quot;</span>, <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</code></pre>
+<div id="confusion-matrixes-in-r" class="section level2">
+<h2><span class="header-section-number">10.1</span> Confusion matrixes in R</h2>
+<pre class="sourceCode r"><code class="sourceCode r">sms_results &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;Chapter 10/sms_results.csv&quot;</span>)</code></pre>
+<ul>
+<li>the first several test cases</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(sms_results)</code></pre>
+<pre><code>##   actual_type predict_type prob_spam prob_ham
+## 1         ham          ham   0.00000  1.00000
+## 2         ham          ham   0.00001  0.99999
+## 3         ham          ham   0.00015  0.99985
+## 4         ham          ham   0.00004  0.99996
+## 5        spam         spam   1.00000  0.00000
+## 6         ham          ham   0.00015  0.99985</code></pre>
+<ul>
+<li>test cases where the model is less confident</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">subset</span>(sms_results, prob_spam <span class="op">&gt;</span><span class="st"> </span><span class="fl">0.40</span> <span class="op">&amp;</span><span class="st"> </span>prob_spam <span class="op">&lt;</span><span class="st"> </span><span class="fl">0.60</span>))</code></pre>
+<pre><code>##      actual_type predict_type prob_spam prob_ham
+## 717          ham         spam   0.51364  0.48636
+## 732         spam          ham   0.49940  0.50060
+## 1311         ham         spam   0.54128  0.45872
+## 1324        spam         spam   0.53398  0.46602</code></pre>
+<ul>
+<li>test cases where the model was wrong</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">head</span>(<span class="kw">subset</span>(sms_results, actual_type <span class="op">!=</span><span class="st"> </span>predict_type))</code></pre>
+<pre><code>##     actual_type predict_type prob_spam prob_ham
+## 53         spam          ham   0.00065  0.99935
+## 59         spam          ham   0.00355  0.99645
+## 73         spam          ham   0.01305  0.98695
+## 76         spam          ham   0.00625  0.99375
+## 184        spam          ham   0.01590  0.98410
+## 187         ham         spam   0.72303  0.27697</code></pre>
+<ul>
+<li>specifying vectors</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(sms_results<span class="op">$</span>actual_type, sms_results<span class="op">$</span>predict_type)</code></pre>
+<pre><code>##       
+##         ham spam
+##   ham  1201    6
+##   spam   30  153</code></pre>
+<ul>
+<li>alternative solution using the formula interface (not shown in book)</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">xtabs</span>(<span class="op">~</span><span class="st"> </span>actual_type <span class="op">+</span><span class="st"> </span>predict_type, sms_results)</code></pre>
+<pre><code>##            predict_type
+## actual_type  ham spam
+##        ham  1201    6
+##        spam   30  153</code></pre>
+<ul>
+<li>using the CrossTable function</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">CrossTable</span>(sms_results<span class="op">$</span>actual_type, sms_results<span class="op">$</span>predict_type)</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## | Chi-square contribution |
+## |           N / Row Total |
+## |           N / Col Total |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  1390 
+## 
+##  
+##                         | sms_results$predict_type 
+## sms_results$actual_type |       ham |      spam | Row Total | 
+## ------------------------|-----------|-----------|-----------|
+##                     ham |      1201 |         6 |      1207 | 
+##                         |    16.317 |   126.328 |           | 
+##                         |     0.995 |     0.005 |     0.868 | 
+##                         |     0.976 |     0.038 |           | 
+##                         |     0.864 |     0.004 |           | 
+## ------------------------|-----------|-----------|-----------|
+##                    spam |        30 |       153 |       183 | 
+##                         |   107.620 |   833.210 |           | 
+##                         |     0.164 |     0.836 |     0.132 | 
+##                         |     0.024 |     0.962 |           | 
+##                         |     0.022 |     0.110 |           | 
+## ------------------------|-----------|-----------|-----------|
+##            Column Total |      1231 |       159 |      1390 | 
+##                         |     0.886 |     0.114 |           | 
+## ------------------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+<ul>
+<li>accuracy and error rate calculation</li>
+<li>accuracy</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">(<span class="dv">152</span> <span class="op">+</span><span class="st"> </span><span class="dv">1203</span>) <span class="op">/</span><span class="st"> </span>(<span class="dv">152</span> <span class="op">+</span><span class="st"> </span><span class="dv">1203</span> <span class="op">+</span><span class="st"> </span><span class="dv">4</span> <span class="op">+</span><span class="st"> </span><span class="dv">31</span>)</code></pre>
+<pre><code>## [1] 0.9748201</code></pre>
+<ul>
+<li>error rate</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">(<span class="dv">4</span> <span class="op">+</span><span class="st"> </span><span class="dv">31</span>) <span class="op">/</span><span class="st"> </span>(<span class="dv">152</span> <span class="op">+</span><span class="st"> </span><span class="dv">1203</span> <span class="op">+</span><span class="st"> </span><span class="dv">4</span> <span class="op">+</span><span class="st"> </span><span class="dv">31</span>)</code></pre>
+<pre><code>## [1] 0.02517986</code></pre>
+<ul>
+<li>error rate = 1 - accuracy</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="fl">0.9748201</span></code></pre>
+<pre><code>## [1] 0.0251799</code></pre>
+</div>
+<div id="beyond-accuracy-other-performance-measures" class="section level2">
+<h2><span class="header-section-number">10.2</span> Beyond accuracy: other performance measures</h2>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confusionMatrix</span>(sms_results<span class="op">$</span>predict_type, sms_results<span class="op">$</span>actual_type, <span class="dt">positive =</span> <span class="st">&quot;spam&quot;</span>)</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction  ham spam
+##       ham  1201   30
+##       spam    6  153
+##                                           
+##                Accuracy : 0.9741          
+##                  95% CI : (0.9643, 0.9818)
+##     No Information Rate : 0.8683          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.8801          
+##  Mcnemar&#39;s Test P-Value : 0.0001264       
+##                                           
+##             Sensitivity : 0.8361          
+##             Specificity : 0.9950          
+##          Pos Pred Value : 0.9623          
+##          Neg Pred Value : 0.9756          
+##              Prevalence : 0.1317          
+##          Detection Rate : 0.1101          
+##    Detection Prevalence : 0.1144          
+##       Balanced Accuracy : 0.9155          
+##                                           
+##        &#39;Positive&#39; Class : spam            
+## </code></pre>
+<ul>
+<li>Kappa statistic</li>
+<li>example using SMS classifier</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">pr_a &lt;-<span class="st"> </span><span class="fl">0.865</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.109</span>
+pr_a</code></pre>
+<pre><code>## [1] 0.974</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">pr_e &lt;-<span class="st"> </span><span class="fl">0.868</span> <span class="op">*</span><span class="st"> </span><span class="fl">0.888</span> <span class="op">+</span><span class="st"> </span><span class="fl">0.132</span> <span class="op">*</span><span class="st"> </span><span class="fl">0.112</span>
+pr_e</code></pre>
+<pre><code>## [1] 0.785568</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">k &lt;-<span class="st"> </span>(pr_a <span class="op">-</span><span class="st"> </span>pr_e) <span class="op">/</span><span class="st"> </span>(<span class="dv">1</span> <span class="op">-</span><span class="st"> </span>pr_e)
+k</code></pre>
+<pre><code>## [1] 0.8787494</code></pre>
+<ul>
+<li>calculate kappa via the vcd package</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Kappa</span>(<span class="kw">table</span>(sms_results<span class="op">$</span>actual_type, sms_results<span class="op">$</span>predict_type))</code></pre>
+<pre><code>##             value     ASE     z Pr(&gt;|z|)
+## Unweighted 0.8801 0.01962 44.85        0
+## Weighted   0.8801 0.01962 44.85        0</code></pre>
+<ul>
+<li>calculate kappa via the irr package</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">kappa2</span>(sms_results[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])</code></pre>
+<pre><code>##  Cohen&#39;s Kappa for 2 Raters (Weights: unweighted)
+## 
+##  Subjects = 1390 
+##    Raters = 2 
+##     Kappa = 0.88 
+## 
+##         z = 32.9 
+##   p-value = 0</code></pre>
+<ul>
+<li>Sensitivity and specificity</li>
+<li>example using SMS classifier</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sens &lt;-<span class="st"> </span><span class="dv">152</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">152</span> <span class="op">+</span><span class="st"> </span><span class="dv">31</span>)
+sens</code></pre>
+<pre><code>## [1] 0.8306011</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">spec &lt;-<span class="st"> </span><span class="dv">1203</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">1203</span> <span class="op">+</span><span class="st"> </span><span class="dv">4</span>)
+spec</code></pre>
+<pre><code>## [1] 0.996686</code></pre>
+<ul>
+<li>example using the caret package</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sensitivity</span>(sms_results<span class="op">$</span>predict_type, sms_results<span class="op">$</span>actual_type, <span class="dt">positive =</span> <span class="st">&quot;spam&quot;</span>)</code></pre>
+<pre><code>## [1] 0.8360656</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">specificity</span>(sms_results<span class="op">$</span>predict_type, sms_results<span class="op">$</span>actual_type, <span class="dt">negative =</span> <span class="st">&quot;ham&quot;</span>)</code></pre>
+<pre><code>## [1] 0.995029</code></pre>
+<ul>
+<li>Precision and recall</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">prec &lt;-<span class="st"> </span><span class="dv">152</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">152</span> <span class="op">+</span><span class="st"> </span><span class="dv">4</span>)
+prec</code></pre>
+<pre><code>## [1] 0.974359</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">rec &lt;-<span class="st"> </span><span class="dv">152</span> <span class="op">/</span><span class="st"> </span>(<span class="dv">152</span> <span class="op">+</span><span class="st"> </span><span class="dv">31</span>)
+rec</code></pre>
+<pre><code>## [1] 0.8306011</code></pre>
+<ul>
+<li>example using the caret package</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">posPredValue</span>(sms_results<span class="op">$</span>predict_type, sms_results<span class="op">$</span>actual_type, <span class="dt">positive =</span> <span class="st">&quot;spam&quot;</span>)</code></pre>
+<pre><code>## [1] 0.9622642</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sensitivity</span>(sms_results<span class="op">$</span>predict_type, sms_results<span class="op">$</span>actual_type, <span class="dt">positive =</span> <span class="st">&quot;spam&quot;</span>)</code></pre>
+<pre><code>## [1] 0.8360656</code></pre>
+<ul>
+<li>F-measure</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>(<span class="dv">2</span> <span class="op">*</span><span class="st"> </span>prec <span class="op">*</span><span class="st"> </span>rec) <span class="op">/</span><span class="st"> </span>(prec <span class="op">+</span><span class="st"> </span>rec)
+f</code></pre>
+<pre><code>## [1] 0.8967552</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">f &lt;-<span class="st"> </span>(<span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="dv">152</span>) <span class="op">/</span><span class="st"> </span>(<span class="dv">2</span> <span class="op">*</span><span class="st"> </span><span class="dv">152</span> <span class="op">+</span><span class="st"> </span><span class="dv">4</span> <span class="op">+</span><span class="st"> </span><span class="dv">31</span>)
+f</code></pre>
+<pre><code>## [1] 0.8967552</code></pre>
+</div>
+<div id="visualizing-performance-tradeoffs" class="section level2">
+<h2><span class="header-section-number">10.3</span> Visualizing Performance Tradeoffs</h2>
+<pre class="sourceCode r"><code class="sourceCode r">pred &lt;-<span class="st"> </span><span class="kw">prediction</span>(<span class="dt">predictions =</span> sms_results<span class="op">$</span>prob_spam,
+                   <span class="dt">labels =</span> sms_results<span class="op">$</span>actual_type)</code></pre>
+<ul>
+<li>ROC curves</li>
+<li>add a reference line to the graph</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">perf &lt;-<span class="st"> </span><span class="kw">performance</span>(pred, <span class="dt">measure =</span> <span class="st">&quot;tpr&quot;</span>, <span class="dt">x.measure =</span> <span class="st">&quot;fpr&quot;</span>)
+<span class="kw">plot</span>(perf, <span class="dt">main =</span> <span class="st">&quot;ROC curve for SMS spam filter&quot;</span>, <span class="dt">col =</span> <span class="st">&quot;blue&quot;</span>, <span class="dt">lwd =</span> <span class="dv">2</span>)
+<span class="kw">abline</span>(<span class="dt">a =</span> <span class="dv">0</span>, <span class="dt">b =</span> <span class="dv">1</span>, <span class="dt">lwd =</span> <span class="dv">2</span>, <span class="dt">lty =</span> <span class="dv">2</span>)</code></pre>
+<p><img src="Chapter10_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<ul>
+<li>calculate AUC</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">perf.auc &lt;-<span class="st"> </span><span class="kw">performance</span>(pred, <span class="dt">measure =</span> <span class="st">&quot;auc&quot;</span>)
+<span class="kw">str</span>(perf.auc)</code></pre>
+<pre><code>## Formal class &#39;performance&#39; [package &quot;ROCR&quot;] with 6 slots
+##   ..@ x.name      : chr &quot;None&quot;
+##   ..@ y.name      : chr &quot;Area under the ROC curve&quot;
+##   ..@ alpha.name  : chr &quot;none&quot;
+##   ..@ x.values    : list()
+##   ..@ y.values    :List of 1
+##   .. ..$ : num 0.984
+##   ..@ alpha.values: list()</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">unlist</span>(perf.auc<span class="op">@</span>y.values)</code></pre>
+<pre><code>## [1] 0.9839846</code></pre>
+</div>
+<div id="estimating-future-performance" class="section level2">
+<h2><span class="header-section-number">10.4</span> Estimating Future Performance</h2>
+<ul>
+<li>partitioning data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">credit &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;Chapter 10/credit.csv&quot;</span>)</code></pre>
+<ul>
+<li>Holdout method</li>
+<li>using random IDs</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">random_ids &lt;-<span class="st"> </span><span class="kw">order</span>(<span class="kw">runif</span>(<span class="dv">1000</span>))
+credit_train &lt;-<span class="st"> </span>credit[random_ids[<span class="dv">1</span><span class="op">:</span><span class="dv">500</span>],]
+credit_validate &lt;-<span class="st"> </span>credit[random_ids[<span class="dv">501</span><span class="op">:</span><span class="dv">750</span>], ]
+credit_test &lt;-<span class="st"> </span>credit[random_ids[<span class="dv">751</span><span class="op">:</span><span class="dv">1000</span>], ]</code></pre>
+<ul>
+<li>using caret function</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">in_train &lt;-<span class="st"> </span><span class="kw">createDataPartition</span>(credit<span class="op">$</span>default, <span class="dt">p =</span> <span class="fl">0.75</span>, <span class="dt">list =</span> <span class="ot">FALSE</span>)
+credit_train &lt;-<span class="st"> </span>credit[in_train, ]
+credit_test &lt;-<span class="st"> </span>credit[<span class="op">-</span>in_train, ]</code></pre>
+<ul>
+<li>10-fold CV</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">folds &lt;-<span class="st"> </span><span class="kw">createFolds</span>(credit<span class="op">$</span>default, <span class="dt">k =</span> <span class="dv">10</span>)
+<span class="kw">str</span>(folds)</code></pre>
+<pre><code>## List of 10
+##  $ Fold01: int [1:100] 34 42 57 72 106 112 121 125 151 167 ...
+##  $ Fold02: int [1:100] 11 17 19 22 55 86 87 89 93 95 ...
+##  $ Fold03: int [1:100] 3 21 32 41 45 49 63 65 82 101 ...
+##  $ Fold04: int [1:100] 2 14 25 29 38 43 56 59 83 84 ...
+##  $ Fold05: int [1:100] 9 20 35 36 53 75 111 129 130 175 ...
+##  $ Fold06: int [1:100] 5 10 28 30 31 52 73 78 85 96 ...
+##  $ Fold07: int [1:100] 8 16 24 33 40 60 62 67 68 74 ...
+##  $ Fold08: int [1:100] 1 6 13 15 27 46 51 69 70 81 ...
+##  $ Fold09: int [1:100] 4 12 23 26 39 47 50 58 61 66 ...
+##  $ Fold10: int [1:100] 7 18 37 44 48 54 64 71 77 80 ...</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">credit01_test &lt;-<span class="st"> </span>credit[folds<span class="op">$</span>Fold01, ]
+credit01_train &lt;-<span class="st"> </span>credit[<span class="op">-</span>folds<span class="op">$</span>Fold01, ]</code></pre>
+<ul>
+<li>Automating 10-fold CV for a C5.0 Decision Tree using lapply</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">credit &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;Chapter 10/credit.csv&quot;</span>)
+
+<span class="kw">set.seed</span>(<span class="dv">123</span>)
+folds &lt;-<span class="st"> </span><span class="kw">createFolds</span>(credit<span class="op">$</span>default, <span class="dt">k =</span> <span class="dv">10</span>)
+
+cv_results &lt;-<span class="st"> </span><span class="kw">lapply</span>(folds, <span class="cf">function</span>(x) {
+  credit_train &lt;-<span class="st"> </span>credit[<span class="op">-</span>x, ]
+  credit_test &lt;-<span class="st"> </span>credit[x, ]
+  credit_model &lt;-<span class="st"> </span><span class="kw">C5.0</span>(default <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> credit_train)
+  credit_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(credit_model, credit_test)
+  credit_actual &lt;-<span class="st"> </span>credit_test<span class="op">$</span>default
+  kappa &lt;-<span class="st"> </span><span class="kw">kappa2</span>(<span class="kw">data.frame</span>(credit_actual, credit_pred))<span class="op">$</span>value
+  <span class="kw">return</span>(kappa)
+})
+
+<span class="kw">str</span>(cv_results)</code></pre>
+<pre><code>## List of 10
+##  $ Fold01: num 0.343
+##  $ Fold02: num 0.255
+##  $ Fold03: num 0.109
+##  $ Fold04: num 0.107
+##  $ Fold05: num 0.338
+##  $ Fold06: num 0.474
+##  $ Fold07: num 0.245
+##  $ Fold08: num 0.0365
+##  $ Fold09: num 0.425
+##  $ Fold10: num 0.505</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(<span class="kw">unlist</span>(cv_results))</code></pre>
+<pre><code>## [1] 0.283796</code></pre>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="clustering-with-k-means.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/mnblanco/MLR/edit/master/Chapter10.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["mlr.pdf", "mlr.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

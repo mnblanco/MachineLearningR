@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 9 Clustering with k-means | Machine Learning with R Solutions</title>
+  <meta name="description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz.">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 9 Clustering with k-means | Machine Learning with R Solutions" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 9 Clustering with k-means | Machine Learning with R Solutions" />
+  
+  <meta name="twitter:description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz." />
+  
+
+<meta name="author" content="Marjorie Blanco">
+
+
+<meta name="date" content="2019-01-02">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="association-rules.html">
+<link rel="next" href="evaluating-model-performance.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Machine Learning with R Solution</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome</a></li>
+<li class="chapter" data-level="1" data-path="introducing-machine-learning.html"><a href="introducing-machine-learning.html"><i class="fa fa-check"></i><b>1</b> Introducing Machine Learning</a></li>
+<li class="chapter" data-level="2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html"><i class="fa fa-check"></i><b>2</b> Managing and Understanding Data</a><ul>
+<li class="chapter" data-level="2.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#r-data-structures"><i class="fa fa-check"></i><b>2.1</b> R data structures</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#vectors"><i class="fa fa-check"></i><b>2.1.1</b> Vectors</a></li>
+<li class="chapter" data-level="2.1.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#factors"><i class="fa fa-check"></i><b>2.1.2</b> Factors</a></li>
+<li class="chapter" data-level="2.1.3" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#lists"><i class="fa fa-check"></i><b>2.1.3</b> Lists</a></li>
+<li class="chapter" data-level="2.1.4" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#data-frames"><i class="fa fa-check"></i><b>2.1.4</b> Data frames</a></li>
+<li class="chapter" data-level="2.1.5" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#matrixes"><i class="fa fa-check"></i><b>2.1.5</b> Matrixes</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#managing-data-with-r"><i class="fa fa-check"></i><b>2.2</b> Managing data with R</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#saving-loading-and-removing-r-data-structures"><i class="fa fa-check"></i><b>2.2.1</b> saving, loading, and removing R data structures</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-and-understanding-data"><i class="fa fa-check"></i><b>2.3</b> Exploring and understanding data</a></li>
+<li class="chapter" data-level="2.4" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#data-exploration-example-using-used-car-data"><i class="fa fa-check"></i><b>2.4</b> data exploration example using used car data</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-the-structure-of-data"><i class="fa fa-check"></i><b>2.4.1</b> Exploring the structure of data</a></li>
+<li class="chapter" data-level="2.4.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-numeric-variables"><i class="fa fa-check"></i><b>2.4.2</b> Exploring numeric variables</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-categorical-variables"><i class="fa fa-check"></i><b>2.5</b> Exploring categorical variables</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-relationships-between-variables"><i class="fa fa-check"></i><b>2.5.1</b> Exploring relationships between variables</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html"><i class="fa fa-check"></i><b>3</b> Classification using Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#lazy-learning"><i class="fa fa-check"></i><b>3.1</b> Lazy Learning</a></li>
+<li class="chapter" data-level="3.2" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#example-classifying-cancer-samples"><i class="fa fa-check"></i><b>3.2</b> Example: Classifying Cancer Samples</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-1-collecting-data"><i class="fa fa-check"></i><b>3.2.1</b> Step 1: collecting data</a></li>
+<li class="chapter" data-level="3.2.2" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-2-exploring-and-preparing-the-data"><i class="fa fa-check"></i><b>3.2.2</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="3.2.3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-3-training-a-model-on-the-data"><i class="fa fa-check"></i><b>3.2.3</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="3.2.4" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-4-evaluating-model-performance"><i class="fa fa-check"></i><b>3.2.4</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="3.2.5" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-5-improving-model-performance"><i class="fa fa-check"></i><b>3.2.5</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#summary"><i class="fa fa-check"></i><b>3.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html"><i class="fa fa-check"></i><b>4</b> Classification using Naive Bayes</a><ul>
+<li class="chapter" data-level="4.1" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#naive-bayes"><i class="fa fa-check"></i><b>4.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="4.2" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#example-filtering-spam-sms-messages"><i class="fa fa-check"></i><b>4.2</b> Example: Filtering spam SMS messages</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-2-exploring-and-preparing-the-data-1"><i class="fa fa-check"></i><b>4.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="4.2.2" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-3-training-a-model-on-the-data-1"><i class="fa fa-check"></i><b>4.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="4.2.3" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-4-evaluating-model-performance-1"><i class="fa fa-check"></i><b>4.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="4.2.4" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-5-improving-model-performance-1"><i class="fa fa-check"></i><b>4.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#summary-1"><i class="fa fa-check"></i><b>4.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html"><i class="fa fa-check"></i><b>5</b> Classification using Decision Trees and Rules</a><ul>
+<li class="chapter" data-level="5.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#part-1-decision-trees"><i class="fa fa-check"></i><b>5.1</b> Part 1: Decision Trees</a></li>
+<li class="chapter" data-level="5.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#understanding-decision-trees"><i class="fa fa-check"></i><b>5.2</b> Understanding Decision Trees</a></li>
+<li class="chapter" data-level="5.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#example-identifying-risky-bank-loans"><i class="fa fa-check"></i><b>5.3</b> Example: Identifying Risky Bank Loans</a><ul>
+<li class="chapter" data-level="5.3.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-2-exploring-and-preparing-the-data-2"><i class="fa fa-check"></i><b>5.3.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="5.3.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-3-training-a-model-on-the-data-2"><i class="fa fa-check"></i><b>5.3.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="5.3.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-4-evaluating-model-performance-2"><i class="fa fa-check"></i><b>5.3.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="5.3.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-5-improving-model-performance-2"><i class="fa fa-check"></i><b>5.3.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#boosting-the-accuracy-of-decision-trees"><i class="fa fa-check"></i><b>5.4</b> Boosting the accuracy of decision trees</a></li>
+<li class="chapter" data-level="5.5" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#making-some-mistakes-more-costly-than-others"><i class="fa fa-check"></i><b>5.5</b> Making some mistakes more costly than others</a></li>
+<li class="chapter" data-level="5.6" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#part-2-rule-learners"><i class="fa fa-check"></i><b>5.6</b> Part 2: Rule Learners</a></li>
+<li class="chapter" data-level="5.7" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#example-identifying-poisonous-mushrooms"><i class="fa fa-check"></i><b>5.7</b> Example: Identifying Poisonous Mushrooms</a><ul>
+<li class="chapter" data-level="5.7.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-2-exploring-and-preparing-the-data-3"><i class="fa fa-check"></i><b>5.7.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="5.7.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-3-training-a-model-on-the-data-3"><i class="fa fa-check"></i><b>5.7.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="5.7.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-4-evaluating-model-performance-3"><i class="fa fa-check"></i><b>5.7.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="5.7.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-5-improving-model-performance-3"><i class="fa fa-check"></i><b>5.7.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.8" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#summary-2"><i class="fa fa-check"></i><b>5.8</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="regression-methods.html"><a href="regression-methods.html"><i class="fa fa-check"></i><b>6</b> Regression Methods</a><ul>
+<li class="chapter" data-level="6.1" data-path="regression-methods.html"><a href="regression-methods.html#part-1-linear-regression"><i class="fa fa-check"></i><b>6.1</b> Part 1: Linear Regression</a></li>
+<li class="chapter" data-level="6.2" data-path="regression-methods.html"><a href="regression-methods.html#understanding-regression"><i class="fa fa-check"></i><b>6.2</b> Understanding regression</a></li>
+<li class="chapter" data-level="6.3" data-path="regression-methods.html"><a href="regression-methods.html#example-space-shuttle-launch-data"><i class="fa fa-check"></i><b>6.3</b> Example: Space Shuttle Launch Data</a></li>
+<li class="chapter" data-level="6.4" data-path="regression-methods.html"><a href="regression-methods.html#example-predicting-medical-expenses"><i class="fa fa-check"></i><b>6.4</b> Example: Predicting Medical Expenses</a><ul>
+<li class="chapter" data-level="6.4.1" data-path="regression-methods.html"><a href="regression-methods.html#step-1-collecting-data-1"><i class="fa fa-check"></i><b>6.4.1</b> Step 1: collecting data</a></li>
+<li class="chapter" data-level="6.4.2" data-path="regression-methods.html"><a href="regression-methods.html#step-2-exploring-and-preparing-the-data-4"><i class="fa fa-check"></i><b>6.4.2</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="6.4.3" data-path="regression-methods.html"><a href="regression-methods.html#step-3-training-a-model-on-the-data-4"><i class="fa fa-check"></i><b>6.4.3</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="6.4.4" data-path="regression-methods.html"><a href="regression-methods.html#step-4-evaluating-model-performance-4"><i class="fa fa-check"></i><b>6.4.4</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="6.4.5" data-path="regression-methods.html"><a href="regression-methods.html#step-5-improving-model-performance-4"><i class="fa fa-check"></i><b>6.4.5</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="regression-methods.html"><a href="regression-methods.html#part-2-regression-trees-and-model-trees"><i class="fa fa-check"></i><b>6.5</b> Part 2: Regression Trees and Model Trees</a></li>
+<li class="chapter" data-level="6.6" data-path="regression-methods.html"><a href="regression-methods.html#understanding-regression-trees-and-model-trees"><i class="fa fa-check"></i><b>6.6</b> Understanding regression trees and model trees</a></li>
+<li class="chapter" data-level="6.7" data-path="regression-methods.html"><a href="regression-methods.html#example-calculating-sdr"><i class="fa fa-check"></i><b>6.7</b> Example: Calculating SDR</a></li>
+<li class="chapter" data-level="6.8" data-path="regression-methods.html"><a href="regression-methods.html#example-estimating-wine-quality"><i class="fa fa-check"></i><b>6.8</b> Example: Estimating Wine Quality</a><ul>
+<li class="chapter" data-level="6.8.1" data-path="regression-methods.html"><a href="regression-methods.html#step-2-exploring-and-preparing-the-data-5"><i class="fa fa-check"></i><b>6.8.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="6.8.2" data-path="regression-methods.html"><a href="regression-methods.html#step-3-training-a-model-on-the-data-5"><i class="fa fa-check"></i><b>6.8.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="6.8.3" data-path="regression-methods.html"><a href="regression-methods.html#step-4-evaluate-model-performance"><i class="fa fa-check"></i><b>6.8.3</b> Step 4: Evaluate model performance</a></li>
+<li class="chapter" data-level="6.8.4" data-path="regression-methods.html"><a href="regression-methods.html#step-5-improving-model-performance-5"><i class="fa fa-check"></i><b>6.8.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html"><i class="fa fa-check"></i><b>7</b> Neural Networks and Support Vector Machines</a><ul>
+<li class="chapter" data-level="7.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#part-1-neural-networks"><i class="fa fa-check"></i><b>7.1</b> Part 1: Neural Networks</a></li>
+<li class="chapter" data-level="7.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#example-modeling-the-strength-of-concrete"><i class="fa fa-check"></i><b>7.2</b> Example: Modeling the Strength of Concrete</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-2-exploring-and-preparing-the-data-6"><i class="fa fa-check"></i><b>7.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="7.2.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-3-training-a-model-on-the-data-6"><i class="fa fa-check"></i><b>7.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="7.2.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-4-evaluating-model-performance-5"><i class="fa fa-check"></i><b>7.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="7.2.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-5-improving-model-performance-6"><i class="fa fa-check"></i><b>7.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#part-2-support-vector-machines"><i class="fa fa-check"></i><b>7.3</b> Part 2: Support Vector Machines</a></li>
+<li class="chapter" data-level="7.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#example-optical-character-recognition"><i class="fa fa-check"></i><b>7.4</b> Example: Optical Character Recognition</a><ul>
+<li class="chapter" data-level="7.4.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-2-exploring-and-preparing-the-data-7"><i class="fa fa-check"></i><b>7.4.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="7.4.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-3-training-a-model-on-the-data-7"><i class="fa fa-check"></i><b>7.4.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="7.4.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-4-evaluating-model-performance-6"><i class="fa fa-check"></i><b>7.4.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="7.4.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-5-improving-model-performance-7"><i class="fa fa-check"></i><b>7.4.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rules.html"><a href="association-rules.html"><i class="fa fa-check"></i><b>8</b> Association Rules</a><ul>
+<li class="chapter" data-level="8.1" data-path="association-rules.html"><a href="association-rules.html#market-basket-analysis"><i class="fa fa-check"></i><b>8.1</b> Market Basket Analysis</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rules.html"><a href="association-rules.html#example-identifying-frequently-purchased-groceries"><i class="fa fa-check"></i><b>8.2</b> Example: Identifying Frequently-Purchased Groceries</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="association-rules.html"><a href="association-rules.html#step-2-exploring-and-preparing-the-data-8"><i class="fa fa-check"></i><b>8.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="8.2.2" data-path="association-rules.html"><a href="association-rules.html#step-3-training-a-model-on-the-data-8"><i class="fa fa-check"></i><b>8.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="8.2.3" data-path="association-rules.html"><a href="association-rules.html#step-4-evaluating-model-performance-7"><i class="fa fa-check"></i><b>8.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="8.2.4" data-path="association-rules.html"><a href="association-rules.html#step-5-improving-model-performance-8"><i class="fa fa-check"></i><b>8.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html"><i class="fa fa-check"></i><b>9</b> Clustering with k-means</a><ul>
+<li class="chapter" data-level="9.1" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#k-means"><i class="fa fa-check"></i><b>9.1</b> k-means</a></li>
+<li class="chapter" data-level="9.2" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#example-finding-teen-market-segments"><i class="fa fa-check"></i><b>9.2</b> Example: Finding Teen Market Segments</a><ul>
+<li class="chapter" data-level="9.2.1" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-2-exploring-and-preparing-the-data-9"><i class="fa fa-check"></i><b>9.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="9.2.2" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-3-training-a-model-on-the-data-9"><i class="fa fa-check"></i><b>9.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="9.2.3" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-4-evaluating-model-performance-8"><i class="fa fa-check"></i><b>9.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="9.2.4" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-5-improving-model-performance-9"><i class="fa fa-check"></i><b>9.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html"><i class="fa fa-check"></i><b>10</b> Evaluating Model Performance</a><ul>
+<li class="chapter" data-level="10.1" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#confusion-matrixes-in-r"><i class="fa fa-check"></i><b>10.1</b> Confusion matrixes in R</a></li>
+<li class="chapter" data-level="10.2" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#beyond-accuracy-other-performance-measures"><i class="fa fa-check"></i><b>10.2</b> Beyond accuracy: other performance measures</a></li>
+<li class="chapter" data-level="10.3" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#visualizing-performance-tradeoffs"><i class="fa fa-check"></i><b>10.3</b> Visualizing Performance Tradeoffs</a></li>
+<li class="chapter" data-level="10.4" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#estimating-future-performance"><i class="fa fa-check"></i><b>10.4</b> Estimating Future Performance</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/mnblanco/MLR" target="blank">Machine Learning with R Solution</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Machine Learning with R Solutions</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="clustering-with-k-means" class="section level1">
+<h1><span class="header-section-number">Chapter 9</span> Clustering with k-means</h1>
+<div id="k-means" class="section level2">
+<h2><span class="header-section-number">9.1</span> k-means</h2>
+</div>
+<div id="example-finding-teen-market-segments" class="section level2">
+<h2><span class="header-section-number">9.2</span> Example: Finding Teen Market Segments</h2>
+<div id="step-2-exploring-and-preparing-the-data-9" class="section level3">
+<h3><span class="header-section-number">9.2.1</span> Step 2: Exploring and preparing the data</h3>
+<pre class="sourceCode r"><code class="sourceCode r">teens &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;Chapter 09/snsdata.csv&quot;</span>)
+<span class="kw">str</span>(teens)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    30000 obs. of  40 variables:
+##  $ gradyear    : int  2006 2006 2006 2006 2006 2006 2006 2006 2006 2006 ...
+##  $ gender      : Factor w/ 2 levels &quot;F&quot;,&quot;M&quot;: 2 1 2 1 NA 1 1 2 1 1 ...
+##  $ age         : num  19 18.8 18.3 18.9 19 ...
+##  $ friends     : int  7 0 69 0 10 142 72 17 52 39 ...
+##  $ basketball  : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ football    : int  0 1 1 0 0 0 0 0 0 0 ...
+##  $ soccer      : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ softball    : int  0 0 0 0 0 0 0 1 0 0 ...
+##  $ volleyball  : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ swimming    : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ cheerleading: int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ baseball    : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ tennis      : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ sports      : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ cute        : int  0 1 0 1 0 0 0 0 0 1 ...
+##  $ sex         : int  0 0 0 0 1 1 0 2 0 0 ...
+##  $ sexy        : int  0 0 0 0 0 0 0 1 0 0 ...
+##  $ hot         : int  0 0 0 0 0 0 0 0 0 1 ...
+##  $ kissed      : int  0 0 0 0 5 0 0 0 0 0 ...
+##  $ dance       : int  1 0 0 0 1 0 0 0 0 0 ...
+##  $ band        : int  0 0 2 0 1 0 1 0 0 0 ...
+##  $ marching    : int  0 0 0 0 0 1 1 0 0 0 ...
+##  $ music       : int  0 2 1 0 3 2 0 1 0 1 ...
+##  $ rock        : int  0 2 0 1 0 0 0 1 0 1 ...
+##  $ god         : int  0 1 0 0 1 0 0 0 0 6 ...
+##  $ church      : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ jesus       : int  0 0 0 0 0 0 0 0 0 2 ...
+##  $ bible       : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ hair        : int  0 6 0 0 1 0 0 0 0 1 ...
+##  $ dress       : int  0 4 0 0 0 1 0 0 0 0 ...
+##  $ blonde      : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ mall        : int  0 1 0 0 0 0 2 0 0 0 ...
+##  $ shopping    : int  0 0 0 0 2 1 0 0 0 1 ...
+##  $ clothes     : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ hollister   : int  0 0 0 0 0 0 2 0 0 0 ...
+##  $ abercrombie : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ die         : int  0 0 0 0 0 0 0 0 0 0 ...
+##  $ death       : int  0 0 1 0 0 0 0 0 0 0 ...
+##  $ drunk       : int  0 0 0 0 1 1 0 0 0 0 ...
+##  $ drugs       : int  0 0 0 0 1 0 0 0 0 0 ...</code></pre>
+<ul>
+<li>look at missing data for female variable</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(teens<span class="op">$</span>gender)</code></pre>
+<pre><code>## 
+##     F     M 
+## 22054  5222</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(teens<span class="op">$</span>gender, <span class="dt">useNA =</span> <span class="st">&quot;ifany&quot;</span>)</code></pre>
+<pre><code>## 
+##     F     M  &lt;NA&gt; 
+## 22054  5222  2724</code></pre>
+<ul>
+<li>look at missing data for age variable</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(teens<span class="op">$</span>age)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA&#39;s 
+##   3.086  16.312  17.287  17.994  18.259 106.927    5086</code></pre>
+<ul>
+<li>eliminate age outliers</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">teens<span class="op">$</span>age &lt;-<span class="st"> </span><span class="kw">ifelse</span>(teens<span class="op">$</span>age <span class="op">&gt;=</span><span class="st"> </span><span class="dv">13</span> <span class="op">&amp;</span><span class="st"> </span>teens<span class="op">$</span>age <span class="op">&lt;</span><span class="st"> </span><span class="dv">20</span>,
+                     teens<span class="op">$</span>age, <span class="ot">NA</span>)
+
+<span class="kw">summary</span>(teens<span class="op">$</span>age)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA&#39;s 
+##   13.03   16.30   17.27   17.25   18.22   20.00    5523</code></pre>
+<ul>
+<li>reassign missing gender values to “unknown”</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">teens<span class="op">$</span>female &lt;-<span class="st"> </span><span class="kw">ifelse</span>(teens<span class="op">$</span>gender <span class="op">==</span><span class="st"> &quot;F&quot;</span> <span class="op">&amp;</span>
+<span class="st">                         </span><span class="op">!</span><span class="kw">is.na</span>(teens<span class="op">$</span>gender), <span class="dv">1</span>, <span class="dv">0</span>)
+teens<span class="op">$</span>no_gender &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(teens<span class="op">$</span>gender), <span class="dv">1</span>, <span class="dv">0</span>)</code></pre>
+<ul>
+<li>check our recoding work</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(teens<span class="op">$</span>gender, <span class="dt">useNA =</span> <span class="st">&quot;ifany&quot;</span>)</code></pre>
+<pre><code>## 
+##     F     M  &lt;NA&gt; 
+## 22054  5222  2724</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(teens<span class="op">$</span>female, <span class="dt">useNA =</span> <span class="st">&quot;ifany&quot;</span>)</code></pre>
+<pre><code>## 
+##     0     1 
+##  7946 22054</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(teens<span class="op">$</span>no_gender, <span class="dt">useNA =</span> <span class="st">&quot;ifany&quot;</span>)</code></pre>
+<pre><code>## 
+##     0     1 
+## 27276  2724</code></pre>
+<ul>
+<li>finding the mean age by cohort</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(teens<span class="op">$</span>age) <span class="co"># doesn&#39;t work</span></code></pre>
+<pre><code>## [1] NA</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(teens<span class="op">$</span>age, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>) <span class="co"># works</span></code></pre>
+<pre><code>## [1] 17.25243</code></pre>
+<ul>
+<li>age by cohort</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">aggregate</span>(<span class="dt">data =</span> teens, age <span class="op">~</span><span class="st"> </span>gradyear, mean, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)</code></pre>
+<pre><code>##   gradyear      age
+## 1     2006 18.65586
+## 2     2007 17.70617
+## 3     2008 16.76770
+## 4     2009 15.81957</code></pre>
+<ul>
+<li>create a vector with the average age for each gradyear, repeated by person</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">ave_age &lt;-<span class="st"> </span><span class="kw">ave</span>(teens<span class="op">$</span>age, teens<span class="op">$</span>gradyear,
+                 <span class="dt">FUN =</span> <span class="cf">function</span>(x) <span class="kw">mean</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>))
+
+
+teens<span class="op">$</span>age &lt;-<span class="st"> </span><span class="kw">ifelse</span>(<span class="kw">is.na</span>(teens<span class="op">$</span>age), ave_age, teens<span class="op">$</span>age)</code></pre>
+<ul>
+<li>check the summary results to ensure missing values are eliminated</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(teens<span class="op">$</span>age)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   13.03   16.28   17.24   17.24   18.21   20.00</code></pre>
+</div>
+<div id="step-3-training-a-model-on-the-data-9" class="section level3">
+<h3><span class="header-section-number">9.2.2</span> Step 3: Training a model on the data</h3>
+<pre class="sourceCode r"><code class="sourceCode r">interests &lt;-<span class="st"> </span>teens[<span class="dv">5</span><span class="op">:</span><span class="dv">40</span>]
+interests_z &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">lapply</span>(interests, scale))
+
+<span class="kw">set.seed</span>(<span class="dv">2345</span>)
+teen_clusters &lt;-<span class="st"> </span><span class="kw">kmeans</span>(interests_z, <span class="dv">5</span>)</code></pre>
+</div>
+<div id="step-4-evaluating-model-performance-8" class="section level3">
+<h3><span class="header-section-number">9.2.3</span> Step 4: Evaluating model performance</h3>
+<ul>
+<li>look at the size of the clusters</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">teen_clusters<span class="op">$</span>size</code></pre>
+<pre><code>## [1]   871   600  5981  1034 21514</code></pre>
+<ul>
+<li>look at the cluster centers</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">teen_clusters<span class="op">$</span>centers</code></pre>
+<pre><code>##    basketball   football      soccer    softball  volleyball    swimming
+## 1  0.16001227  0.2364174  0.10385512  0.07232021  0.18897158  0.23970234
+## 2 -0.09195886  0.0652625 -0.09932124 -0.01739428 -0.06219308  0.03339844
+## 3  0.52755083  0.4873480  0.29778605  0.37178877  0.37986175  0.29628671
+## 4  0.34081039  0.3593965  0.12722250  0.16384661  0.11032200  0.26943332
+## 5 -0.16695523 -0.1641499 -0.09033520 -0.11367669 -0.11682181 -0.10595448
+##   cheerleading    baseball      tennis      sports        cute
+## 1    0.3931445  0.02993479  0.13532387  0.10257837  0.37884271
+## 2   -0.1101103 -0.11487510  0.04062204 -0.09899231 -0.03265037
+## 3    0.3303485  0.35231971  0.14057808  0.32967130  0.54442929
+## 4    0.1856664  0.27527088  0.10980958  0.79711920  0.47866008
+## 5   -0.1136077 -0.10918483 -0.05097057 -0.13135334 -0.18878627
+##            sex        sexy         hot      kissed       dance        band
+## 1  0.020042068  0.11740551  0.41389104  0.06787768  0.22780899 -0.10257102
+## 2 -0.042486141 -0.04329091 -0.03812345 -0.04554933  0.04573186  4.06726666
+## 3  0.002913623  0.24040196  0.38551819 -0.03356121  0.45662534 -0.02120728
+## 4  2.028471066  0.51266080  0.31708549  2.97973077  0.45535061  0.38053621
+## 5 -0.097928345 -0.09501817 -0.13810894 -0.13535855 -0.15932739 -0.12167214
+##      marching      music        rock         god      church       jesus
+## 1 -0.10942590  0.1378306  0.05905951  0.03651755 -0.00709374  0.01458533
+## 2  5.25757242  0.4981238  0.15963917  0.09283620  0.06414651  0.04801941
+## 3 -0.10880541  0.2844999  0.21436936  0.35014919  0.53739806  0.27843424
+## 4 -0.02014608  1.1367885  1.21013948  0.41679142  0.16627797  0.12988313
+## 5 -0.11098063 -0.1532006 -0.12460034 -0.12144246 -0.15889274 -0.08557822
+##         bible        hair       dress      blonde        mall    shopping
+## 1 -0.03692278  0.43807926  0.14905267  0.06137340  0.60368108  0.79806891
+## 2  0.05863810 -0.04484083  0.07201611 -0.01146396 -0.08724304 -0.03865318
+## 3  0.22990963  0.23612853  0.39407628  0.03471458  0.48318495  0.66327838
+## 4  0.08478769  2.55623737  0.53852195  0.36134138  0.62256686  0.27101815
+## 5 -0.06813159 -0.20498730 -0.14348036 -0.02918252 -0.18625656 -0.22865236
+##         clothes  hollister abercrombie          die       death
+## 1  0.5651537331  4.1521844  3.96493810  0.043475966  0.09857501
+## 2 -0.0003526292 -0.1678300 -0.14129577  0.009447317  0.05135888
+## 3  0.3759725120 -0.0553846 -0.07417839  0.037989066  0.11972190
+## 4  1.2306917174  0.1610784  0.26324494  1.712181870  0.93631312
+## 5 -0.1865419798 -0.1557662 -0.14861104 -0.094875180 -0.08370729
+##          drunk       drugs
+## 1  0.035614771  0.03443294
+## 2 -0.086773220 -0.06878491
+## 3 -0.009688746 -0.05973769
+## 4  1.897388200  2.73326605
+## 5 -0.087520105 -0.11423381</code></pre>
+</div>
+<div id="step-5-improving-model-performance-9" class="section level3">
+<h3><span class="header-section-number">9.2.4</span> Step 5: Improving model performance</h3>
+<ul>
+<li>apply the cluster IDs to the original data frame</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">teens<span class="op">$</span>cluster &lt;-<span class="st"> </span>teen_clusters<span class="op">$</span>cluster</code></pre>
+<ul>
+<li>look at the first five records</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">teens[<span class="dv">1</span><span class="op">:</span><span class="dv">5</span>, <span class="kw">c</span>(<span class="st">&quot;cluster&quot;</span>, <span class="st">&quot;gender&quot;</span>, <span class="st">&quot;age&quot;</span>, <span class="st">&quot;friends&quot;</span>)]</code></pre>
+<pre><code>##   cluster gender    age friends
+## 1       5      M 18.982       7
+## 2       3      F 18.801       0
+## 3       5      M 18.335      69
+## 4       5      F 18.875       0
+## 5       4   &lt;NA&gt; 18.995      10</code></pre>
+<ul>
+<li>mean age by cluster</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">aggregate</span>(<span class="dt">data =</span> teens, age <span class="op">~</span><span class="st"> </span>cluster, mean)</code></pre>
+<pre><code>##   cluster      age
+## 1       1 16.86497
+## 2       2 17.39037
+## 3       3 17.07656
+## 4       4 17.11957
+## 5       5 17.29849</code></pre>
+<ul>
+<li>proportion of females by cluster</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">aggregate</span>(<span class="dt">data =</span> teens, female <span class="op">~</span><span class="st"> </span>cluster, mean)</code></pre>
+<pre><code>##   cluster    female
+## 1       1 0.8381171
+## 2       2 0.7250000
+## 3       3 0.8378198
+## 4       4 0.8027079
+## 5       5 0.6994515</code></pre>
+<ul>
+<li>mean number of friends by cluster</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">aggregate</span>(<span class="dt">data =</span> teens, friends <span class="op">~</span><span class="st"> </span>cluster, mean)</code></pre>
+<pre><code>##   cluster  friends
+## 1       1 41.43054
+## 2       2 32.57333
+## 3       3 37.16185
+## 4       4 30.50290
+## 5       5 27.70052</code></pre>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="association-rules.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="evaluating-model-performance.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/mnblanco/MLR/edit/master/Chapter09.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["mlr.pdf", "mlr.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 3 Classification using Nearest Neighbors | Machine Learning with R Solutions</title>
+  <meta name="description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz.">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 3 Classification using Nearest Neighbors | Machine Learning with R Solutions" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Classification using Nearest Neighbors | Machine Learning with R Solutions" />
+  
+  <meta name="twitter:description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz." />
+  
+
+<meta name="author" content="Marjorie Blanco">
+
+
+<meta name="date" content="2019-01-02">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="managing-and-understanding-data.html">
+<link rel="next" href="classification-using-naive-bayes.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Machine Learning with R Solution</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome</a></li>
+<li class="chapter" data-level="1" data-path="introducing-machine-learning.html"><a href="introducing-machine-learning.html"><i class="fa fa-check"></i><b>1</b> Introducing Machine Learning</a></li>
+<li class="chapter" data-level="2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html"><i class="fa fa-check"></i><b>2</b> Managing and Understanding Data</a><ul>
+<li class="chapter" data-level="2.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#r-data-structures"><i class="fa fa-check"></i><b>2.1</b> R data structures</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#vectors"><i class="fa fa-check"></i><b>2.1.1</b> Vectors</a></li>
+<li class="chapter" data-level="2.1.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#factors"><i class="fa fa-check"></i><b>2.1.2</b> Factors</a></li>
+<li class="chapter" data-level="2.1.3" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#lists"><i class="fa fa-check"></i><b>2.1.3</b> Lists</a></li>
+<li class="chapter" data-level="2.1.4" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#data-frames"><i class="fa fa-check"></i><b>2.1.4</b> Data frames</a></li>
+<li class="chapter" data-level="2.1.5" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#matrixes"><i class="fa fa-check"></i><b>2.1.5</b> Matrixes</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#managing-data-with-r"><i class="fa fa-check"></i><b>2.2</b> Managing data with R</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#saving-loading-and-removing-r-data-structures"><i class="fa fa-check"></i><b>2.2.1</b> saving, loading, and removing R data structures</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-and-understanding-data"><i class="fa fa-check"></i><b>2.3</b> Exploring and understanding data</a></li>
+<li class="chapter" data-level="2.4" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#data-exploration-example-using-used-car-data"><i class="fa fa-check"></i><b>2.4</b> data exploration example using used car data</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-the-structure-of-data"><i class="fa fa-check"></i><b>2.4.1</b> Exploring the structure of data</a></li>
+<li class="chapter" data-level="2.4.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-numeric-variables"><i class="fa fa-check"></i><b>2.4.2</b> Exploring numeric variables</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-categorical-variables"><i class="fa fa-check"></i><b>2.5</b> Exploring categorical variables</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-relationships-between-variables"><i class="fa fa-check"></i><b>2.5.1</b> Exploring relationships between variables</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html"><i class="fa fa-check"></i><b>3</b> Classification using Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#lazy-learning"><i class="fa fa-check"></i><b>3.1</b> Lazy Learning</a></li>
+<li class="chapter" data-level="3.2" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#example-classifying-cancer-samples"><i class="fa fa-check"></i><b>3.2</b> Example: Classifying Cancer Samples</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-1-collecting-data"><i class="fa fa-check"></i><b>3.2.1</b> Step 1: collecting data</a></li>
+<li class="chapter" data-level="3.2.2" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-2-exploring-and-preparing-the-data"><i class="fa fa-check"></i><b>3.2.2</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="3.2.3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-3-training-a-model-on-the-data"><i class="fa fa-check"></i><b>3.2.3</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="3.2.4" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-4-evaluating-model-performance"><i class="fa fa-check"></i><b>3.2.4</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="3.2.5" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-5-improving-model-performance"><i class="fa fa-check"></i><b>3.2.5</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#summary"><i class="fa fa-check"></i><b>3.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html"><i class="fa fa-check"></i><b>4</b> Classification using Naive Bayes</a><ul>
+<li class="chapter" data-level="4.1" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#naive-bayes"><i class="fa fa-check"></i><b>4.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="4.2" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#example-filtering-spam-sms-messages"><i class="fa fa-check"></i><b>4.2</b> Example: Filtering spam SMS messages</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-2-exploring-and-preparing-the-data-1"><i class="fa fa-check"></i><b>4.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="4.2.2" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-3-training-a-model-on-the-data-1"><i class="fa fa-check"></i><b>4.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="4.2.3" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-4-evaluating-model-performance-1"><i class="fa fa-check"></i><b>4.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="4.2.4" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-5-improving-model-performance-1"><i class="fa fa-check"></i><b>4.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#summary-1"><i class="fa fa-check"></i><b>4.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html"><i class="fa fa-check"></i><b>5</b> Classification using Decision Trees and Rules</a><ul>
+<li class="chapter" data-level="5.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#part-1-decision-trees"><i class="fa fa-check"></i><b>5.1</b> Part 1: Decision Trees</a></li>
+<li class="chapter" data-level="5.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#understanding-decision-trees"><i class="fa fa-check"></i><b>5.2</b> Understanding Decision Trees</a></li>
+<li class="chapter" data-level="5.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#example-identifying-risky-bank-loans"><i class="fa fa-check"></i><b>5.3</b> Example: Identifying Risky Bank Loans</a><ul>
+<li class="chapter" data-level="5.3.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-2-exploring-and-preparing-the-data-2"><i class="fa fa-check"></i><b>5.3.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="5.3.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-3-training-a-model-on-the-data-2"><i class="fa fa-check"></i><b>5.3.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="5.3.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-4-evaluating-model-performance-2"><i class="fa fa-check"></i><b>5.3.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="5.3.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-5-improving-model-performance-2"><i class="fa fa-check"></i><b>5.3.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#boosting-the-accuracy-of-decision-trees"><i class="fa fa-check"></i><b>5.4</b> Boosting the accuracy of decision trees</a></li>
+<li class="chapter" data-level="5.5" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#making-some-mistakes-more-costly-than-others"><i class="fa fa-check"></i><b>5.5</b> Making some mistakes more costly than others</a></li>
+<li class="chapter" data-level="5.6" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#part-2-rule-learners"><i class="fa fa-check"></i><b>5.6</b> Part 2: Rule Learners</a></li>
+<li class="chapter" data-level="5.7" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#example-identifying-poisonous-mushrooms"><i class="fa fa-check"></i><b>5.7</b> Example: Identifying Poisonous Mushrooms</a><ul>
+<li class="chapter" data-level="5.7.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-2-exploring-and-preparing-the-data-3"><i class="fa fa-check"></i><b>5.7.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="5.7.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-3-training-a-model-on-the-data-3"><i class="fa fa-check"></i><b>5.7.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="5.7.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-4-evaluating-model-performance-3"><i class="fa fa-check"></i><b>5.7.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="5.7.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-5-improving-model-performance-3"><i class="fa fa-check"></i><b>5.7.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.8" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#summary-2"><i class="fa fa-check"></i><b>5.8</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="regression-methods.html"><a href="regression-methods.html"><i class="fa fa-check"></i><b>6</b> Regression Methods</a><ul>
+<li class="chapter" data-level="6.1" data-path="regression-methods.html"><a href="regression-methods.html#part-1-linear-regression"><i class="fa fa-check"></i><b>6.1</b> Part 1: Linear Regression</a></li>
+<li class="chapter" data-level="6.2" data-path="regression-methods.html"><a href="regression-methods.html#understanding-regression"><i class="fa fa-check"></i><b>6.2</b> Understanding regression</a></li>
+<li class="chapter" data-level="6.3" data-path="regression-methods.html"><a href="regression-methods.html#example-space-shuttle-launch-data"><i class="fa fa-check"></i><b>6.3</b> Example: Space Shuttle Launch Data</a></li>
+<li class="chapter" data-level="6.4" data-path="regression-methods.html"><a href="regression-methods.html#example-predicting-medical-expenses"><i class="fa fa-check"></i><b>6.4</b> Example: Predicting Medical Expenses</a><ul>
+<li class="chapter" data-level="6.4.1" data-path="regression-methods.html"><a href="regression-methods.html#step-1-collecting-data-1"><i class="fa fa-check"></i><b>6.4.1</b> Step 1: collecting data</a></li>
+<li class="chapter" data-level="6.4.2" data-path="regression-methods.html"><a href="regression-methods.html#step-2-exploring-and-preparing-the-data-4"><i class="fa fa-check"></i><b>6.4.2</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="6.4.3" data-path="regression-methods.html"><a href="regression-methods.html#step-3-training-a-model-on-the-data-4"><i class="fa fa-check"></i><b>6.4.3</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="6.4.4" data-path="regression-methods.html"><a href="regression-methods.html#step-4-evaluating-model-performance-4"><i class="fa fa-check"></i><b>6.4.4</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="6.4.5" data-path="regression-methods.html"><a href="regression-methods.html#step-5-improving-model-performance-4"><i class="fa fa-check"></i><b>6.4.5</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="regression-methods.html"><a href="regression-methods.html#part-2-regression-trees-and-model-trees"><i class="fa fa-check"></i><b>6.5</b> Part 2: Regression Trees and Model Trees</a></li>
+<li class="chapter" data-level="6.6" data-path="regression-methods.html"><a href="regression-methods.html#understanding-regression-trees-and-model-trees"><i class="fa fa-check"></i><b>6.6</b> Understanding regression trees and model trees</a></li>
+<li class="chapter" data-level="6.7" data-path="regression-methods.html"><a href="regression-methods.html#example-calculating-sdr"><i class="fa fa-check"></i><b>6.7</b> Example: Calculating SDR</a></li>
+<li class="chapter" data-level="6.8" data-path="regression-methods.html"><a href="regression-methods.html#example-estimating-wine-quality"><i class="fa fa-check"></i><b>6.8</b> Example: Estimating Wine Quality</a><ul>
+<li class="chapter" data-level="6.8.1" data-path="regression-methods.html"><a href="regression-methods.html#step-2-exploring-and-preparing-the-data-5"><i class="fa fa-check"></i><b>6.8.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="6.8.2" data-path="regression-methods.html"><a href="regression-methods.html#step-3-training-a-model-on-the-data-5"><i class="fa fa-check"></i><b>6.8.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="6.8.3" data-path="regression-methods.html"><a href="regression-methods.html#step-4-evaluate-model-performance"><i class="fa fa-check"></i><b>6.8.3</b> Step 4: Evaluate model performance</a></li>
+<li class="chapter" data-level="6.8.4" data-path="regression-methods.html"><a href="regression-methods.html#step-5-improving-model-performance-5"><i class="fa fa-check"></i><b>6.8.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html"><i class="fa fa-check"></i><b>7</b> Neural Networks and Support Vector Machines</a><ul>
+<li class="chapter" data-level="7.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#part-1-neural-networks"><i class="fa fa-check"></i><b>7.1</b> Part 1: Neural Networks</a></li>
+<li class="chapter" data-level="7.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#example-modeling-the-strength-of-concrete"><i class="fa fa-check"></i><b>7.2</b> Example: Modeling the Strength of Concrete</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-2-exploring-and-preparing-the-data-6"><i class="fa fa-check"></i><b>7.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="7.2.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-3-training-a-model-on-the-data-6"><i class="fa fa-check"></i><b>7.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="7.2.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-4-evaluating-model-performance-5"><i class="fa fa-check"></i><b>7.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="7.2.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-5-improving-model-performance-6"><i class="fa fa-check"></i><b>7.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#part-2-support-vector-machines"><i class="fa fa-check"></i><b>7.3</b> Part 2: Support Vector Machines</a></li>
+<li class="chapter" data-level="7.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#example-optical-character-recognition"><i class="fa fa-check"></i><b>7.4</b> Example: Optical Character Recognition</a><ul>
+<li class="chapter" data-level="7.4.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-2-exploring-and-preparing-the-data-7"><i class="fa fa-check"></i><b>7.4.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="7.4.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-3-training-a-model-on-the-data-7"><i class="fa fa-check"></i><b>7.4.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="7.4.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-4-evaluating-model-performance-6"><i class="fa fa-check"></i><b>7.4.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="7.4.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-5-improving-model-performance-7"><i class="fa fa-check"></i><b>7.4.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rules.html"><a href="association-rules.html"><i class="fa fa-check"></i><b>8</b> Association Rules</a><ul>
+<li class="chapter" data-level="8.1" data-path="association-rules.html"><a href="association-rules.html#market-basket-analysis"><i class="fa fa-check"></i><b>8.1</b> Market Basket Analysis</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rules.html"><a href="association-rules.html#example-identifying-frequently-purchased-groceries"><i class="fa fa-check"></i><b>8.2</b> Example: Identifying Frequently-Purchased Groceries</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="association-rules.html"><a href="association-rules.html#step-2-exploring-and-preparing-the-data-8"><i class="fa fa-check"></i><b>8.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="8.2.2" data-path="association-rules.html"><a href="association-rules.html#step-3-training-a-model-on-the-data-8"><i class="fa fa-check"></i><b>8.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="8.2.3" data-path="association-rules.html"><a href="association-rules.html#step-4-evaluating-model-performance-7"><i class="fa fa-check"></i><b>8.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="8.2.4" data-path="association-rules.html"><a href="association-rules.html#step-5-improving-model-performance-8"><i class="fa fa-check"></i><b>8.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html"><i class="fa fa-check"></i><b>9</b> Clustering with k-means</a><ul>
+<li class="chapter" data-level="9.1" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#k-means"><i class="fa fa-check"></i><b>9.1</b> k-means</a></li>
+<li class="chapter" data-level="9.2" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#example-finding-teen-market-segments"><i class="fa fa-check"></i><b>9.2</b> Example: Finding Teen Market Segments</a><ul>
+<li class="chapter" data-level="9.2.1" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-2-exploring-and-preparing-the-data-9"><i class="fa fa-check"></i><b>9.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="9.2.2" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-3-training-a-model-on-the-data-9"><i class="fa fa-check"></i><b>9.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="9.2.3" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-4-evaluating-model-performance-8"><i class="fa fa-check"></i><b>9.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="9.2.4" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-5-improving-model-performance-9"><i class="fa fa-check"></i><b>9.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html"><i class="fa fa-check"></i><b>10</b> Evaluating Model Performance</a><ul>
+<li class="chapter" data-level="10.1" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#confusion-matrixes-in-r"><i class="fa fa-check"></i><b>10.1</b> Confusion matrixes in R</a></li>
+<li class="chapter" data-level="10.2" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#beyond-accuracy-other-performance-measures"><i class="fa fa-check"></i><b>10.2</b> Beyond accuracy: other performance measures</a></li>
+<li class="chapter" data-level="10.3" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#visualizing-performance-tradeoffs"><i class="fa fa-check"></i><b>10.3</b> Visualizing Performance Tradeoffs</a></li>
+<li class="chapter" data-level="10.4" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#estimating-future-performance"><i class="fa fa-check"></i><b>10.4</b> Estimating Future Performance</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/mnblanco/MLR" target="blank">Machine Learning with R Solution</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Machine Learning with R Solutions</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="classification-using-nearest-neighbors" class="section level1">
+<h1><span class="header-section-number">Chapter 3</span> Classification using Nearest Neighbors</h1>
+<div id="lazy-learning" class="section level2">
+<h2><span class="header-section-number">3.1</span> Lazy Learning</h2>
+<p>Nearest neighbor classifiers are defined by their characteristic of classifying unlabeled examples by assigning them the class of similar labeled examples</p>
+<p>The strengths and weaknesses of this algorithm are as follows:</p>
+<p>Classification algorithms based on the nearest neighbor methods are considered lazy learning algorithms because, technically speaking, no abstraction occurs.</p>
+<p>Uses information about an example’s k-nearest neighbors to classify unlabeled examples. The letter k is a variable term implying that any number of nearest neighbors to be used.</p>
+<p>distance function, or a formula that measures the similarity between the two instances.</p>
+<p>Euclidean distance, which is the distance one would measure if it were possible to use a ruler to connect two points.</p>
+<ul>
+<li><p>Euclidean distance is measured “as the crow flies,” implying the shortest direct route.</p></li>
+<li><p>Manhattan distance, which is based on the paths a pedestrian would take by walking city blocks.</p></li>
+</ul>
+<p>The balance between overfitting and underfitting the training data is a problem known as bias-variance tradeoff.</p>
+<p>k equal to the square root of the number of training examples</p>
+<p>weighted voting process in which the vote of the closer neighbors is considered more authoritative than the vote of the far away neighborh</p>
+</div>
+<div id="example-classifying-cancer-samples" class="section level2">
+<h2><span class="header-section-number">3.2</span> Example: Classifying Cancer Samples</h2>
+<div id="step-1-collecting-data" class="section level3">
+<h3><span class="header-section-number">3.2.1</span> Step 1: collecting data</h3>
+<p>We will utilize the Wisconsin Breast Cancer Diagnostic dataset from the UCI Machine Learning Repository at <a href="http://archive.ics.uci.edu/ml" class="uri">http://archive.ics.uci.edu/ml</a>. This data was donated by researchers of the University of Wisconsin and includes the measurements from digitized images of fine-needle aspirate of a breast mass. The values represent the characteristics of the cell nuclei present in the digital image.</p>
+<p>The breast cancer data includes 569 examples of cancer biopsies, each with 32 features. One feature is an identification number, another is the cancer diagnosis, and 30 are numeric-valued laboratory measurements. The diagnosis is coded as “M” to indicate malignant or “B” to indicate benign.</p>
+</div>
+<div id="step-2-exploring-and-preparing-the-data" class="section level3">
+<h3><span class="header-section-number">3.2.2</span> Step 2: Exploring and preparing the data</h3>
+<ul>
+<li>import the CSV file</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;Chapter 03/wisc_bc_data.csv&quot;</span>)</code></pre>
+<ul>
+<li>Examine the structure of the wbcd data frame</li>
+</ul>
+<p>The other 30 numeric measurements comprise the mean, standard error, and worst (that is, largest) value for 10 different characteristics of the digitized cell nuclei.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(wbcd)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    569 obs. of  32 variables:
+##  $ id               : int  87139402 8910251 905520 868871 9012568 906539 925291 87880 862989 89827 ...
+##  $ diagnosis        : Factor w/ 2 levels &quot;B&quot;,&quot;M&quot;: 1 1 1 1 1 1 1 2 1 1 ...
+##  $ radius_mean      : num  12.3 10.6 11 11.3 15.2 ...
+##  $ texture_mean     : num  12.4 18.9 16.8 13.4 13.2 ...
+##  $ perimeter_mean   : num  78.8 69.3 70.9 73 97.7 ...
+##  $ area_mean        : num  464 346 373 385 712 ...
+##  $ smoothness_mean  : num  0.1028 0.0969 0.1077 0.1164 0.0796 ...
+##  $ compactness_mean : num  0.0698 0.1147 0.078 0.1136 0.0693 ...
+##  $ concavity_mean   : num  0.0399 0.0639 0.0305 0.0464 0.0339 ...
+##  $ points_mean      : num  0.037 0.0264 0.0248 0.048 0.0266 ...
+##  $ symmetry_mean    : num  0.196 0.192 0.171 0.177 0.172 ...
+##  $ dimension_mean   : num  0.0595 0.0649 0.0634 0.0607 0.0554 ...
+##  $ radius_se        : num  0.236 0.451 0.197 0.338 0.178 ...
+##  $ texture_se       : num  0.666 1.197 1.387 1.343 0.412 ...
+##  $ perimeter_se     : num  1.67 3.43 1.34 1.85 1.34 ...
+##  $ area_se          : num  17.4 27.1 13.5 26.3 17.7 ...
+##  $ smoothness_se    : num  0.00805 0.00747 0.00516 0.01127 0.00501 ...
+##  $ compactness_se   : num  0.0118 0.03581 0.00936 0.03498 0.01485 ...
+##  $ concavity_se     : num  0.0168 0.0335 0.0106 0.0219 0.0155 ...
+##  $ points_se        : num  0.01241 0.01365 0.00748 0.01965 0.00915 ...
+##  $ symmetry_se      : num  0.0192 0.035 0.0172 0.0158 0.0165 ...
+##  $ dimension_se     : num  0.00225 0.00332 0.0022 0.00344 0.00177 ...
+##  $ radius_worst     : num  13.5 11.9 12.4 11.9 16.2 ...
+##  $ texture_worst    : num  15.6 22.9 26.4 15.8 15.7 ...
+##  $ perimeter_worst  : num  87 78.3 79.9 76.5 104.5 ...
+##  $ area_worst       : num  549 425 471 434 819 ...
+##  $ smoothness_worst : num  0.139 0.121 0.137 0.137 0.113 ...
+##  $ compactness_worst: num  0.127 0.252 0.148 0.182 0.174 ...
+##  $ concavity_worst  : num  0.1242 0.1916 0.1067 0.0867 0.1362 ...
+##  $ points_worst     : num  0.0939 0.0793 0.0743 0.0861 0.0818 ...
+##  $ symmetry_worst   : num  0.283 0.294 0.3 0.21 0.249 ...
+##  $ dimension_worst  : num  0.0677 0.0759 0.0788 0.0678 0.0677 ...</code></pre>
+<ul>
+<li>Drop the id feature</li>
+</ul>
+<p>As this is simply a unique identifier (ID) for each patient in the data, it does not provide useful information, and we will need to exclude it from the model.</p>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd &lt;-<span class="st"> </span>wbcd[<span class="op">-</span><span class="dv">1</span>]</code></pre>
+<ul>
+<li>table of diagnosis</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(wbcd<span class="op">$</span>diagnosis)</code></pre>
+<pre><code>## 
+##   B   M 
+## 357 212</code></pre>
+<ul>
+<li>Recode diagnosis as a factor</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd<span class="op">$</span>diagnosis &lt;-<span class="st"> </span><span class="kw">factor</span>(wbcd<span class="op">$</span>diagnosis, <span class="dt">levels =</span> <span class="kw">c</span>(<span class="st">&quot;B&quot;</span>, <span class="st">&quot;M&quot;</span>),
+                         <span class="dt">labels =</span> <span class="kw">c</span>(<span class="st">&quot;Benign&quot;</span>, <span class="st">&quot;Malignant&quot;</span>))</code></pre>
+<ul>
+<li>Table or proportions with more informative labels</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">round</span>(<span class="kw">prop.table</span>(<span class="kw">table</span>(wbcd<span class="op">$</span>diagnosis)) <span class="op">*</span><span class="st"> </span><span class="dv">100</span>, <span class="dt">digits =</span> <span class="dv">1</span>)</code></pre>
+<pre><code>## 
+##    Benign Malignant 
+##      62.7      37.3</code></pre>
+<ul>
+<li>Summarize three numeric features</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(wbcd[<span class="kw">c</span>(<span class="st">&quot;radius_mean&quot;</span>, <span class="st">&quot;area_mean&quot;</span>, <span class="st">&quot;smoothness_mean&quot;</span>)])</code></pre>
+<pre><code>##   radius_mean       area_mean      smoothness_mean  
+##  Min.   : 6.981   Min.   : 143.5   Min.   :0.05263  
+##  1st Qu.:11.700   1st Qu.: 420.3   1st Qu.:0.08637  
+##  Median :13.370   Median : 551.1   Median :0.09587  
+##  Mean   :14.127   Mean   : 654.9   Mean   :0.09636  
+##  3rd Qu.:15.780   3rd Qu.: 782.7   3rd Qu.:0.10530  
+##  Max.   :28.110   Max.   :2501.0   Max.   :0.16340</code></pre>
+<p>The distance calculation for k-NN is heavily dependent upon the measurement scale of the input features. The impact of area is going to be much larger than the smoothness in the distance calculation.</p>
+<p>The traditional method of rescaling features for k-NN is <code>min-max normalization</code>. This process transforms a feature such that all of its values fall in a range between 0 and 1.</p>
+<p><code>z-score standardization</code> subtracts the mean value of feature X, and divides the outcome by the standard deviation of X.</p>
+<p>The same rescaling method used on the k-NN training dataset must also be applied to the examples the algorithm will later classify.</p>
+<ul>
+<li>use z-score standardization under the assumption that the future examples will have similar mean and standard deviation as the training examples.</li>
+</ul>
+<p>The Euclidean distance formula is not defined for nominal data: dummy coding, where a value of 1 indicates one category, and 0, the other</p>
+<ul>
+<li><p>n-category nominal feature can be dummy coded by creating the binary indicator variables for (n - 1) levels of the feature</p></li>
+<li><p>Create normalization function</p></li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">normalize &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
+  <span class="kw">return</span> ((x <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(x)) <span class="op">/</span><span class="st"> </span>(<span class="kw">max</span>(x) <span class="op">-</span><span class="st"> </span><span class="kw">min</span>(x)))
+}</code></pre>
+<ul>
+<li>Test normalization function - result should be identical</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">normalize</span>(<span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>))</code></pre>
+<pre><code>## [1] 0.00 0.25 0.50 0.75 1.00</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">normalize</span>(<span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>, <span class="dv">50</span>))</code></pre>
+<pre><code>## [1] 0.00 0.25 0.50 0.75 1.00</code></pre>
+<ul>
+<li>Normalize the wbcd data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_n &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">lapply</span>(wbcd[<span class="dv">2</span><span class="op">:</span><span class="dv">31</span>], normalize))</code></pre>
+<ul>
+<li>Confirm that normalization worked</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(wbcd_n<span class="op">$</span>area_mean)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##  0.0000  0.1174  0.1729  0.2169  0.2711  1.0000</code></pre>
+<ul>
+<li>Create training and test data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_train &lt;-<span class="st"> </span>wbcd_n[<span class="dv">1</span><span class="op">:</span><span class="dv">469</span>, ]
+wbcd_test &lt;-<span class="st"> </span>wbcd_n[<span class="dv">470</span><span class="op">:</span><span class="dv">569</span>, ]</code></pre>
+<ul>
+<li>Create labels for training and test data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_train_labels &lt;-<span class="st"> </span>wbcd[<span class="dv">1</span><span class="op">:</span><span class="dv">469</span>, <span class="dv">1</span>]
+wbcd_test_labels &lt;-<span class="st"> </span>wbcd[<span class="dv">470</span><span class="op">:</span><span class="dv">569</span>, <span class="dv">1</span>]</code></pre>
+</div>
+<div id="step-3-training-a-model-on-the-data" class="section level3">
+<h3><span class="header-section-number">3.2.3</span> Step 3: Training a model on the data</h3>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_test_pred &lt;-<span class="st"> </span><span class="kw">knn</span>(<span class="dt">train =</span> wbcd_train, <span class="dt">test =</span> wbcd_test,
+                      <span class="dt">cl =</span> <span class="kw">as.vector</span>(wbcd_train_labels), <span class="dt">k =</span> <span class="dv">21</span>)</code></pre>
+</div>
+<div id="step-4-evaluating-model-performance" class="section level3">
+<h3><span class="header-section-number">3.2.4</span> Step 4: Evaluating model performance</h3>
+<p>Create the cross tabulation of predicted vs. actual</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">CrossTable</span>(<span class="dt">x =</span> wbcd_test_labels, <span class="dt">y =</span> wbcd_test_pred,
+           <span class="dt">prop.chisq =</span> <span class="ot">FALSE</span>)</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Row Total |
+## |           N / Col Total |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  100 
+## 
+##  
+##                  | wbcd_test_pred 
+## wbcd_test_labels |    Benign | Malignant | Row Total | 
+## -----------------|-----------|-----------|-----------|
+##           Benign |        61 |         0 |        61 | 
+##                  |     1.000 |     0.000 |     0.610 | 
+##                  |     0.968 |     0.000 |           | 
+##                  |     0.610 |     0.000 |           | 
+## -----------------|-----------|-----------|-----------|
+##        Malignant |         2 |        37 |        39 | 
+##                  |     0.051 |     0.949 |     0.390 | 
+##                  |     0.032 |     1.000 |           | 
+##                  |     0.020 |     0.370 |           | 
+## -----------------|-----------|-----------|-----------|
+##     Column Total |        63 |        37 |       100 | 
+##                  |     0.630 |     0.370 |           | 
+## -----------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+</div>
+<div id="step-5-improving-model-performance" class="section level3">
+<h3><span class="header-section-number">3.2.5</span> Step 5: Improving model performance</h3>
+<ul>
+<li>Use the scale() function to z-score standardize a data frame</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_z &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">scale</span>(wbcd[<span class="op">-</span><span class="dv">1</span>]))</code></pre>
+<ul>
+<li>Confirm that the transformation was applied correctly</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(wbcd_z<span class="op">$</span>area_mean)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## -1.4532 -0.6666 -0.2949  0.0000  0.3632  5.2459</code></pre>
+<ul>
+<li>Create training and test datasets</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_train &lt;-<span class="st"> </span>wbcd_z[<span class="dv">1</span><span class="op">:</span><span class="dv">469</span>, ]
+wbcd_test &lt;-<span class="st"> </span>wbcd_z[<span class="dv">470</span><span class="op">:</span><span class="dv">569</span>, ]</code></pre>
+<ul>
+<li>re-classify test cases</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_test_pred &lt;-<span class="st"> </span><span class="kw">knn</span>(<span class="dt">train =</span> wbcd_train, <span class="dt">test =</span>  wbcd_test,
+                      <span class="dt">cl =</span> wbcd_train_labels, <span class="dt">k =</span> <span class="dv">21</span>)</code></pre>
+<ul>
+<li>Create the cross tabulation of predicted vs. actual</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">CrossTable</span>(<span class="dt">x =</span> wbcd_test_labels, <span class="dt">y =</span> wbcd_test_pred,
+           <span class="dt">prop.chisq =</span> <span class="ot">FALSE</span>)</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Row Total |
+## |           N / Col Total |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  100 
+## 
+##  
+##                  | wbcd_test_pred 
+## wbcd_test_labels |    Benign | Malignant | Row Total | 
+## -----------------|-----------|-----------|-----------|
+##           Benign |        61 |         0 |        61 | 
+##                  |     1.000 |     0.000 |     0.610 | 
+##                  |     0.924 |     0.000 |           | 
+##                  |     0.610 |     0.000 |           | 
+## -----------------|-----------|-----------|-----------|
+##        Malignant |         5 |        34 |        39 | 
+##                  |     0.128 |     0.872 |     0.390 | 
+##                  |     0.076 |     1.000 |           | 
+##                  |     0.050 |     0.340 |           | 
+## -----------------|-----------|-----------|-----------|
+##     Column Total |        66 |        34 |       100 | 
+##                  |     0.660 |     0.340 |           | 
+## -----------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+<ul>
+<li>try several different values of k</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_train &lt;-<span class="st"> </span>wbcd_n[<span class="dv">1</span><span class="op">:</span><span class="dv">469</span>, ]
+wbcd_test &lt;-<span class="st"> </span>wbcd_n[<span class="dv">470</span><span class="op">:</span><span class="dv">569</span>, ]
+
+wbcd_test_pred &lt;-<span class="st"> </span><span class="kw">knn</span>(<span class="dt">train =</span> wbcd_train, <span class="dt">test =</span> wbcd_test, <span class="dt">cl =</span> wbcd_train_labels, <span class="dt">k=</span><span class="dv">1</span>)
+<span class="kw">CrossTable</span>(<span class="dt">x =</span> wbcd_test_labels, <span class="dt">y =</span> wbcd_test_pred, <span class="dt">prop.chisq=</span><span class="ot">FALSE</span>)</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Row Total |
+## |           N / Col Total |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  100 
+## 
+##  
+##                  | wbcd_test_pred 
+## wbcd_test_labels |    Benign | Malignant | Row Total | 
+## -----------------|-----------|-----------|-----------|
+##           Benign |        58 |         3 |        61 | 
+##                  |     0.951 |     0.049 |     0.610 | 
+##                  |     0.983 |     0.073 |           | 
+##                  |     0.580 |     0.030 |           | 
+## -----------------|-----------|-----------|-----------|
+##        Malignant |         1 |        38 |        39 | 
+##                  |     0.026 |     0.974 |     0.390 | 
+##                  |     0.017 |     0.927 |           | 
+##                  |     0.010 |     0.380 |           | 
+## -----------------|-----------|-----------|-----------|
+##     Column Total |        59 |        41 |       100 | 
+##                  |     0.590 |     0.410 |           | 
+## -----------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_test_pred &lt;-<span class="st"> </span><span class="kw">knn</span>(<span class="dt">train =</span> wbcd_train, <span class="dt">test =</span> wbcd_test, <span class="dt">cl =</span> wbcd_train_labels, <span class="dt">k=</span><span class="dv">5</span>)
+<span class="kw">CrossTable</span>(<span class="dt">x =</span> wbcd_test_labels, <span class="dt">y =</span> wbcd_test_pred, <span class="dt">prop.chisq=</span><span class="ot">FALSE</span>)</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Row Total |
+## |           N / Col Total |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  100 
+## 
+##  
+##                  | wbcd_test_pred 
+## wbcd_test_labels |    Benign | Malignant | Row Total | 
+## -----------------|-----------|-----------|-----------|
+##           Benign |        61 |         0 |        61 | 
+##                  |     1.000 |     0.000 |     0.610 | 
+##                  |     0.968 |     0.000 |           | 
+##                  |     0.610 |     0.000 |           | 
+## -----------------|-----------|-----------|-----------|
+##        Malignant |         2 |        37 |        39 | 
+##                  |     0.051 |     0.949 |     0.390 | 
+##                  |     0.032 |     1.000 |           | 
+##                  |     0.020 |     0.370 |           | 
+## -----------------|-----------|-----------|-----------|
+##     Column Total |        63 |        37 |       100 | 
+##                  |     0.630 |     0.370 |           | 
+## -----------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_test_pred &lt;-<span class="st"> </span><span class="kw">knn</span>(<span class="dt">train =</span> wbcd_train, <span class="dt">test =</span> wbcd_test, <span class="dt">cl =</span> wbcd_train_labels, <span class="dt">k=</span><span class="dv">11</span>)
+<span class="kw">CrossTable</span>(<span class="dt">x =</span> wbcd_test_labels, <span class="dt">y =</span> wbcd_test_pred, <span class="dt">prop.chisq=</span><span class="ot">FALSE</span>)</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Row Total |
+## |           N / Col Total |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  100 
+## 
+##  
+##                  | wbcd_test_pred 
+## wbcd_test_labels |    Benign | Malignant | Row Total | 
+## -----------------|-----------|-----------|-----------|
+##           Benign |        61 |         0 |        61 | 
+##                  |     1.000 |     0.000 |     0.610 | 
+##                  |     0.953 |     0.000 |           | 
+##                  |     0.610 |     0.000 |           | 
+## -----------------|-----------|-----------|-----------|
+##        Malignant |         3 |        36 |        39 | 
+##                  |     0.077 |     0.923 |     0.390 | 
+##                  |     0.047 |     1.000 |           | 
+##                  |     0.030 |     0.360 |           | 
+## -----------------|-----------|-----------|-----------|
+##     Column Total |        64 |        36 |       100 | 
+##                  |     0.640 |     0.360 |           | 
+## -----------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_test_pred &lt;-<span class="st"> </span><span class="kw">knn</span>(<span class="dt">train =</span> wbcd_train, <span class="dt">test =</span> wbcd_test, <span class="dt">cl =</span> wbcd_train_labels, <span class="dt">k=</span><span class="dv">15</span>)
+<span class="kw">CrossTable</span>(<span class="dt">x =</span> wbcd_test_labels, <span class="dt">y =</span> wbcd_test_pred, <span class="dt">prop.chisq=</span><span class="ot">FALSE</span>)</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Row Total |
+## |           N / Col Total |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  100 
+## 
+##  
+##                  | wbcd_test_pred 
+## wbcd_test_labels |    Benign | Malignant | Row Total | 
+## -----------------|-----------|-----------|-----------|
+##           Benign |        61 |         0 |        61 | 
+##                  |     1.000 |     0.000 |     0.610 | 
+##                  |     0.953 |     0.000 |           | 
+##                  |     0.610 |     0.000 |           | 
+## -----------------|-----------|-----------|-----------|
+##        Malignant |         3 |        36 |        39 | 
+##                  |     0.077 |     0.923 |     0.390 | 
+##                  |     0.047 |     1.000 |           | 
+##                  |     0.030 |     0.360 |           | 
+## -----------------|-----------|-----------|-----------|
+##     Column Total |        64 |        36 |       100 | 
+##                  |     0.640 |     0.360 |           | 
+## -----------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_test_pred &lt;-<span class="st"> </span><span class="kw">knn</span>(<span class="dt">train =</span> wbcd_train, <span class="dt">test =</span> wbcd_test, <span class="dt">cl =</span> wbcd_train_labels, <span class="dt">k=</span><span class="dv">21</span>)
+<span class="kw">CrossTable</span>(<span class="dt">x =</span> wbcd_test_labels, <span class="dt">y =</span> wbcd_test_pred, <span class="dt">prop.chisq=</span><span class="ot">FALSE</span>)</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Row Total |
+## |           N / Col Total |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  100 
+## 
+##  
+##                  | wbcd_test_pred 
+## wbcd_test_labels |    Benign | Malignant | Row Total | 
+## -----------------|-----------|-----------|-----------|
+##           Benign |        61 |         0 |        61 | 
+##                  |     1.000 |     0.000 |     0.610 | 
+##                  |     0.968 |     0.000 |           | 
+##                  |     0.610 |     0.000 |           | 
+## -----------------|-----------|-----------|-----------|
+##        Malignant |         2 |        37 |        39 | 
+##                  |     0.051 |     0.949 |     0.390 | 
+##                  |     0.032 |     1.000 |           | 
+##                  |     0.020 |     0.370 |           | 
+## -----------------|-----------|-----------|-----------|
+##     Column Total |        63 |        37 |       100 | 
+##                  |     0.630 |     0.370 |           | 
+## -----------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">wbcd_test_pred &lt;-<span class="st"> </span><span class="kw">knn</span>(<span class="dt">train =</span> wbcd_train, <span class="dt">test =</span> wbcd_test, <span class="dt">cl =</span> wbcd_train_labels, <span class="dt">k=</span><span class="dv">27</span>)
+<span class="kw">CrossTable</span>(<span class="dt">x =</span> wbcd_test_labels, <span class="dt">y =</span> wbcd_test_pred, <span class="dt">prop.chisq=</span><span class="ot">FALSE</span>)</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Row Total |
+## |           N / Col Total |
+## |         N / Table Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  100 
+## 
+##  
+##                  | wbcd_test_pred 
+## wbcd_test_labels |    Benign | Malignant | Row Total | 
+## -----------------|-----------|-----------|-----------|
+##           Benign |        61 |         0 |        61 | 
+##                  |     1.000 |     0.000 |     0.610 | 
+##                  |     0.938 |     0.000 |           | 
+##                  |     0.610 |     0.000 |           | 
+## -----------------|-----------|-----------|-----------|
+##        Malignant |         4 |        35 |        39 | 
+##                  |     0.103 |     0.897 |     0.390 | 
+##                  |     0.062 |     1.000 |           | 
+##                  |     0.040 |     0.350 |           | 
+## -----------------|-----------|-----------|-----------|
+##     Column Total |        65 |        35 |       100 | 
+##                  |     0.650 |     0.350 |           | 
+## -----------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2><span class="header-section-number">3.3</span> Summary</h2>
+<ul>
+<li>k-NN does not do any learning</li>
+<li>k-NN simply stores the training data verbatim</li>
+<li>capable of tackling extremely complex tasks, such as the identification of cancerous masses</li>
+</ul>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="managing-and-understanding-data.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="classification-using-naive-bayes.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/mnblanco/MLR/edit/master/Chapter03.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["mlr.pdf", "mlr.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

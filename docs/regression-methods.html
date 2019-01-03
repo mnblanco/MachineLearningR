@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 6 Regression Methods | Machine Learning with R Solutions</title>
+  <meta name="description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz.">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 6 Regression Methods | Machine Learning with R Solutions" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 6 Regression Methods | Machine Learning with R Solutions" />
+  
+  <meta name="twitter:description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz." />
+  
+
+<meta name="author" content="Marjorie Blanco">
+
+
+<meta name="date" content="2019-01-02">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="classification-using-decision-trees-and-rules.html">
+<link rel="next" href="neural-networks-and-support-vector-machines.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Machine Learning with R Solution</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome</a></li>
+<li class="chapter" data-level="1" data-path="introducing-machine-learning.html"><a href="introducing-machine-learning.html"><i class="fa fa-check"></i><b>1</b> Introducing Machine Learning</a></li>
+<li class="chapter" data-level="2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html"><i class="fa fa-check"></i><b>2</b> Managing and Understanding Data</a><ul>
+<li class="chapter" data-level="2.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#r-data-structures"><i class="fa fa-check"></i><b>2.1</b> R data structures</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#vectors"><i class="fa fa-check"></i><b>2.1.1</b> Vectors</a></li>
+<li class="chapter" data-level="2.1.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#factors"><i class="fa fa-check"></i><b>2.1.2</b> Factors</a></li>
+<li class="chapter" data-level="2.1.3" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#lists"><i class="fa fa-check"></i><b>2.1.3</b> Lists</a></li>
+<li class="chapter" data-level="2.1.4" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#data-frames"><i class="fa fa-check"></i><b>2.1.4</b> Data frames</a></li>
+<li class="chapter" data-level="2.1.5" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#matrixes"><i class="fa fa-check"></i><b>2.1.5</b> Matrixes</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#managing-data-with-r"><i class="fa fa-check"></i><b>2.2</b> Managing data with R</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#saving-loading-and-removing-r-data-structures"><i class="fa fa-check"></i><b>2.2.1</b> saving, loading, and removing R data structures</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-and-understanding-data"><i class="fa fa-check"></i><b>2.3</b> Exploring and understanding data</a></li>
+<li class="chapter" data-level="2.4" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#data-exploration-example-using-used-car-data"><i class="fa fa-check"></i><b>2.4</b> data exploration example using used car data</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-the-structure-of-data"><i class="fa fa-check"></i><b>2.4.1</b> Exploring the structure of data</a></li>
+<li class="chapter" data-level="2.4.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-numeric-variables"><i class="fa fa-check"></i><b>2.4.2</b> Exploring numeric variables</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-categorical-variables"><i class="fa fa-check"></i><b>2.5</b> Exploring categorical variables</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-relationships-between-variables"><i class="fa fa-check"></i><b>2.5.1</b> Exploring relationships between variables</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html"><i class="fa fa-check"></i><b>3</b> Classification using Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#lazy-learning"><i class="fa fa-check"></i><b>3.1</b> Lazy Learning</a></li>
+<li class="chapter" data-level="3.2" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#example-classifying-cancer-samples"><i class="fa fa-check"></i><b>3.2</b> Example: Classifying Cancer Samples</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-1-collecting-data"><i class="fa fa-check"></i><b>3.2.1</b> Step 1: collecting data</a></li>
+<li class="chapter" data-level="3.2.2" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-2-exploring-and-preparing-the-data"><i class="fa fa-check"></i><b>3.2.2</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="3.2.3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-3-training-a-model-on-the-data"><i class="fa fa-check"></i><b>3.2.3</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="3.2.4" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-4-evaluating-model-performance"><i class="fa fa-check"></i><b>3.2.4</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="3.2.5" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-5-improving-model-performance"><i class="fa fa-check"></i><b>3.2.5</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#summary"><i class="fa fa-check"></i><b>3.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html"><i class="fa fa-check"></i><b>4</b> Classification using Naive Bayes</a><ul>
+<li class="chapter" data-level="4.1" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#naive-bayes"><i class="fa fa-check"></i><b>4.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="4.2" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#example-filtering-spam-sms-messages"><i class="fa fa-check"></i><b>4.2</b> Example: Filtering spam SMS messages</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-2-exploring-and-preparing-the-data-1"><i class="fa fa-check"></i><b>4.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="4.2.2" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-3-training-a-model-on-the-data-1"><i class="fa fa-check"></i><b>4.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="4.2.3" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-4-evaluating-model-performance-1"><i class="fa fa-check"></i><b>4.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="4.2.4" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-5-improving-model-performance-1"><i class="fa fa-check"></i><b>4.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#summary-1"><i class="fa fa-check"></i><b>4.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html"><i class="fa fa-check"></i><b>5</b> Classification using Decision Trees and Rules</a><ul>
+<li class="chapter" data-level="5.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#part-1-decision-trees"><i class="fa fa-check"></i><b>5.1</b> Part 1: Decision Trees</a></li>
+<li class="chapter" data-level="5.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#understanding-decision-trees"><i class="fa fa-check"></i><b>5.2</b> Understanding Decision Trees</a></li>
+<li class="chapter" data-level="5.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#example-identifying-risky-bank-loans"><i class="fa fa-check"></i><b>5.3</b> Example: Identifying Risky Bank Loans</a><ul>
+<li class="chapter" data-level="5.3.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-2-exploring-and-preparing-the-data-2"><i class="fa fa-check"></i><b>5.3.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="5.3.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-3-training-a-model-on-the-data-2"><i class="fa fa-check"></i><b>5.3.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="5.3.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-4-evaluating-model-performance-2"><i class="fa fa-check"></i><b>5.3.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="5.3.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-5-improving-model-performance-2"><i class="fa fa-check"></i><b>5.3.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#boosting-the-accuracy-of-decision-trees"><i class="fa fa-check"></i><b>5.4</b> Boosting the accuracy of decision trees</a></li>
+<li class="chapter" data-level="5.5" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#making-some-mistakes-more-costly-than-others"><i class="fa fa-check"></i><b>5.5</b> Making some mistakes more costly than others</a></li>
+<li class="chapter" data-level="5.6" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#part-2-rule-learners"><i class="fa fa-check"></i><b>5.6</b> Part 2: Rule Learners</a></li>
+<li class="chapter" data-level="5.7" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#example-identifying-poisonous-mushrooms"><i class="fa fa-check"></i><b>5.7</b> Example: Identifying Poisonous Mushrooms</a><ul>
+<li class="chapter" data-level="5.7.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-2-exploring-and-preparing-the-data-3"><i class="fa fa-check"></i><b>5.7.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="5.7.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-3-training-a-model-on-the-data-3"><i class="fa fa-check"></i><b>5.7.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="5.7.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-4-evaluating-model-performance-3"><i class="fa fa-check"></i><b>5.7.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="5.7.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-5-improving-model-performance-3"><i class="fa fa-check"></i><b>5.7.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.8" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#summary-2"><i class="fa fa-check"></i><b>5.8</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="regression-methods.html"><a href="regression-methods.html"><i class="fa fa-check"></i><b>6</b> Regression Methods</a><ul>
+<li class="chapter" data-level="6.1" data-path="regression-methods.html"><a href="regression-methods.html#part-1-linear-regression"><i class="fa fa-check"></i><b>6.1</b> Part 1: Linear Regression</a></li>
+<li class="chapter" data-level="6.2" data-path="regression-methods.html"><a href="regression-methods.html#understanding-regression"><i class="fa fa-check"></i><b>6.2</b> Understanding regression</a></li>
+<li class="chapter" data-level="6.3" data-path="regression-methods.html"><a href="regression-methods.html#example-space-shuttle-launch-data"><i class="fa fa-check"></i><b>6.3</b> Example: Space Shuttle Launch Data</a></li>
+<li class="chapter" data-level="6.4" data-path="regression-methods.html"><a href="regression-methods.html#example-predicting-medical-expenses"><i class="fa fa-check"></i><b>6.4</b> Example: Predicting Medical Expenses</a><ul>
+<li class="chapter" data-level="6.4.1" data-path="regression-methods.html"><a href="regression-methods.html#step-1-collecting-data-1"><i class="fa fa-check"></i><b>6.4.1</b> Step 1: collecting data</a></li>
+<li class="chapter" data-level="6.4.2" data-path="regression-methods.html"><a href="regression-methods.html#step-2-exploring-and-preparing-the-data-4"><i class="fa fa-check"></i><b>6.4.2</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="6.4.3" data-path="regression-methods.html"><a href="regression-methods.html#step-3-training-a-model-on-the-data-4"><i class="fa fa-check"></i><b>6.4.3</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="6.4.4" data-path="regression-methods.html"><a href="regression-methods.html#step-4-evaluating-model-performance-4"><i class="fa fa-check"></i><b>6.4.4</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="6.4.5" data-path="regression-methods.html"><a href="regression-methods.html#step-5-improving-model-performance-4"><i class="fa fa-check"></i><b>6.4.5</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="regression-methods.html"><a href="regression-methods.html#part-2-regression-trees-and-model-trees"><i class="fa fa-check"></i><b>6.5</b> Part 2: Regression Trees and Model Trees</a></li>
+<li class="chapter" data-level="6.6" data-path="regression-methods.html"><a href="regression-methods.html#understanding-regression-trees-and-model-trees"><i class="fa fa-check"></i><b>6.6</b> Understanding regression trees and model trees</a></li>
+<li class="chapter" data-level="6.7" data-path="regression-methods.html"><a href="regression-methods.html#example-calculating-sdr"><i class="fa fa-check"></i><b>6.7</b> Example: Calculating SDR</a></li>
+<li class="chapter" data-level="6.8" data-path="regression-methods.html"><a href="regression-methods.html#example-estimating-wine-quality"><i class="fa fa-check"></i><b>6.8</b> Example: Estimating Wine Quality</a><ul>
+<li class="chapter" data-level="6.8.1" data-path="regression-methods.html"><a href="regression-methods.html#step-2-exploring-and-preparing-the-data-5"><i class="fa fa-check"></i><b>6.8.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="6.8.2" data-path="regression-methods.html"><a href="regression-methods.html#step-3-training-a-model-on-the-data-5"><i class="fa fa-check"></i><b>6.8.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="6.8.3" data-path="regression-methods.html"><a href="regression-methods.html#step-4-evaluate-model-performance"><i class="fa fa-check"></i><b>6.8.3</b> Step 4: Evaluate model performance</a></li>
+<li class="chapter" data-level="6.8.4" data-path="regression-methods.html"><a href="regression-methods.html#step-5-improving-model-performance-5"><i class="fa fa-check"></i><b>6.8.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html"><i class="fa fa-check"></i><b>7</b> Neural Networks and Support Vector Machines</a><ul>
+<li class="chapter" data-level="7.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#part-1-neural-networks"><i class="fa fa-check"></i><b>7.1</b> Part 1: Neural Networks</a></li>
+<li class="chapter" data-level="7.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#example-modeling-the-strength-of-concrete"><i class="fa fa-check"></i><b>7.2</b> Example: Modeling the Strength of Concrete</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-2-exploring-and-preparing-the-data-6"><i class="fa fa-check"></i><b>7.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="7.2.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-3-training-a-model-on-the-data-6"><i class="fa fa-check"></i><b>7.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="7.2.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-4-evaluating-model-performance-5"><i class="fa fa-check"></i><b>7.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="7.2.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-5-improving-model-performance-6"><i class="fa fa-check"></i><b>7.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#part-2-support-vector-machines"><i class="fa fa-check"></i><b>7.3</b> Part 2: Support Vector Machines</a></li>
+<li class="chapter" data-level="7.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#example-optical-character-recognition"><i class="fa fa-check"></i><b>7.4</b> Example: Optical Character Recognition</a><ul>
+<li class="chapter" data-level="7.4.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-2-exploring-and-preparing-the-data-7"><i class="fa fa-check"></i><b>7.4.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="7.4.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-3-training-a-model-on-the-data-7"><i class="fa fa-check"></i><b>7.4.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="7.4.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-4-evaluating-model-performance-6"><i class="fa fa-check"></i><b>7.4.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="7.4.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-5-improving-model-performance-7"><i class="fa fa-check"></i><b>7.4.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rules.html"><a href="association-rules.html"><i class="fa fa-check"></i><b>8</b> Association Rules</a><ul>
+<li class="chapter" data-level="8.1" data-path="association-rules.html"><a href="association-rules.html#market-basket-analysis"><i class="fa fa-check"></i><b>8.1</b> Market Basket Analysis</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rules.html"><a href="association-rules.html#example-identifying-frequently-purchased-groceries"><i class="fa fa-check"></i><b>8.2</b> Example: Identifying Frequently-Purchased Groceries</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="association-rules.html"><a href="association-rules.html#step-2-exploring-and-preparing-the-data-8"><i class="fa fa-check"></i><b>8.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="8.2.2" data-path="association-rules.html"><a href="association-rules.html#step-3-training-a-model-on-the-data-8"><i class="fa fa-check"></i><b>8.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="8.2.3" data-path="association-rules.html"><a href="association-rules.html#step-4-evaluating-model-performance-7"><i class="fa fa-check"></i><b>8.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="8.2.4" data-path="association-rules.html"><a href="association-rules.html#step-5-improving-model-performance-8"><i class="fa fa-check"></i><b>8.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html"><i class="fa fa-check"></i><b>9</b> Clustering with k-means</a><ul>
+<li class="chapter" data-level="9.1" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#k-means"><i class="fa fa-check"></i><b>9.1</b> k-means</a></li>
+<li class="chapter" data-level="9.2" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#example-finding-teen-market-segments"><i class="fa fa-check"></i><b>9.2</b> Example: Finding Teen Market Segments</a><ul>
+<li class="chapter" data-level="9.2.1" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-2-exploring-and-preparing-the-data-9"><i class="fa fa-check"></i><b>9.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="9.2.2" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-3-training-a-model-on-the-data-9"><i class="fa fa-check"></i><b>9.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="9.2.3" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-4-evaluating-model-performance-8"><i class="fa fa-check"></i><b>9.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="9.2.4" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-5-improving-model-performance-9"><i class="fa fa-check"></i><b>9.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html"><i class="fa fa-check"></i><b>10</b> Evaluating Model Performance</a><ul>
+<li class="chapter" data-level="10.1" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#confusion-matrixes-in-r"><i class="fa fa-check"></i><b>10.1</b> Confusion matrixes in R</a></li>
+<li class="chapter" data-level="10.2" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#beyond-accuracy-other-performance-measures"><i class="fa fa-check"></i><b>10.2</b> Beyond accuracy: other performance measures</a></li>
+<li class="chapter" data-level="10.3" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#visualizing-performance-tradeoffs"><i class="fa fa-check"></i><b>10.3</b> Visualizing Performance Tradeoffs</a></li>
+<li class="chapter" data-level="10.4" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#estimating-future-performance"><i class="fa fa-check"></i><b>10.4</b> Estimating Future Performance</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/mnblanco/MLR" target="blank">Machine Learning with R Solution</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Machine Learning with R Solutions</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="regression-methods" class="section level1">
+<h1><span class="header-section-number">Chapter 6</span> Regression Methods</h1>
+<div id="part-1-linear-regression" class="section level2">
+<h2><span class="header-section-number">6.1</span> Part 1: Linear Regression</h2>
+<p>Regression is concerned with specifying the relationship between a single numeric dependent variable (the value to be predicted) and one or more numeric independent variables (the predictors).</p>
+<p>Regression methods are also used for statistical hypothesis testing, which determines whether a premise is likely to be true or false in light of the observed data.</p>
+<ul>
+<li>basic linear regression models—those that use straight lines with only a single independent variable known as simple linear regression.</li>
+<li>the case of two or more independent variables, this is known as multiple linear regression, or simply “multiple regression”.</li>
+<li><p>Both of these techniques assume that the dependent variable is measured on a continuous scale</p></li>
+<li>logistic regression is used to model a binary categorical outcome</li>
+<li>Poisson regression models integer count data</li>
+<li><p>multinomial logistic regression models a categorical outcome</p></li>
+</ul>
+</div>
+<div id="understanding-regression" class="section level2">
+<h2><span class="header-section-number">6.2</span> Understanding regression</h2>
+</div>
+<div id="example-space-shuttle-launch-data" class="section level2">
+<h2><span class="header-section-number">6.3</span> Example: Space Shuttle Launch Data</h2>
+<pre class="sourceCode r"><code class="sourceCode r">launch &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;Chapter 06/challenger.csv&quot;</span>)</code></pre>
+<ul>
+<li>estimate beta manually</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">b &lt;-<span class="st"> </span><span class="kw">cov</span>(launch<span class="op">$</span>temperature, launch<span class="op">$</span>distress_ct) <span class="op">/</span><span class="st"> </span><span class="kw">var</span>(launch<span class="op">$</span>temperature)
+b</code></pre>
+<pre><code>## [1] -0.04753968</code></pre>
+<ul>
+<li>estimate alpha manually</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">mean</span>(launch<span class="op">$</span>distress_ct) <span class="op">-</span><span class="st"> </span>b <span class="op">*</span><span class="st"> </span><span class="kw">mean</span>(launch<span class="op">$</span>temperature)
+a</code></pre>
+<pre><code>## [1] 3.698413</code></pre>
+<ul>
+<li>calculate the correlation of launch data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">r &lt;-<span class="st"> </span><span class="kw">cov</span>(launch<span class="op">$</span>temperature, launch<span class="op">$</span>distress_ct) <span class="op">/</span>
+<span class="st">       </span>(<span class="kw">sd</span>(launch<span class="op">$</span>temperature) <span class="op">*</span><span class="st"> </span><span class="kw">sd</span>(launch<span class="op">$</span>distress_ct))
+r</code></pre>
+<pre><code>## [1] -0.5111264</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cor</span>(launch<span class="op">$</span>temperature, launch<span class="op">$</span>distress_ct)</code></pre>
+<pre><code>## [1] -0.5111264</code></pre>
+<ul>
+<li>computing the slope using correlation</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">r <span class="op">*</span><span class="st"> </span>(<span class="kw">sd</span>(launch<span class="op">$</span>distress_ct) <span class="op">/</span><span class="st"> </span><span class="kw">sd</span>(launch<span class="op">$</span>temperature))</code></pre>
+<pre><code>## [1] -0.04753968</code></pre>
+<ul>
+<li>confirming the regression line using the lm function (not in text)</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>(distress_ct <span class="op">~</span><span class="st"> </span>temperature <span class="op">+</span><span class="st"> </span>field_check_pressure <span class="op">+</span><span class="st"> </span>flight_num, <span class="dt">data =</span> launch)
+model</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = distress_ct ~ temperature + field_check_pressure + 
+##     flight_num, data = launch)
+## 
+## Coefficients:
+##          (Intercept)           temperature  field_check_pressure  
+##             3.527093             -0.051386              0.001757  
+##           flight_num  
+##             0.014293</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = distress_ct ~ temperature + field_check_pressure + 
+##     flight_num, data = launch)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.65003 -0.24414 -0.11219  0.01279  1.67530 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)           3.527093   1.307024   2.699   0.0142 *
+## temperature          -0.051386   0.018341  -2.802   0.0114 *
+## field_check_pressure  0.001757   0.003402   0.517   0.6115  
+## flight_num            0.014293   0.035138   0.407   0.6887  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.565 on 19 degrees of freedom
+## Multiple R-squared:   0.36,  Adjusted R-squared:  0.259 
+## F-statistic: 3.563 on 3 and 19 DF,  p-value: 0.03371</code></pre>
+<ul>
+<li>creating a simple multiple regression function</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">reg &lt;-<span class="st"> </span><span class="cf">function</span>(y, x) {
+  x &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(x)
+  x &lt;-<span class="st"> </span><span class="kw">cbind</span>(<span class="dt">Intercept =</span> <span class="dv">1</span>, x)
+  b &lt;-<span class="st"> </span><span class="kw">solve</span>(<span class="kw">t</span>(x) <span class="op">%*%</span><span class="st"> </span>x) <span class="op">%*%</span><span class="st"> </span><span class="kw">t</span>(x) <span class="op">%*%</span><span class="st"> </span>y
+  <span class="kw">colnames</span>(b) &lt;-<span class="st"> &quot;estimate&quot;</span>
+  <span class="kw">print</span>(b)
+}</code></pre>
+<ul>
+<li>examine the launch data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(launch) </code></pre>
+<pre><code>## &#39;data.frame&#39;:    23 obs. of  4 variables:
+##  $ distress_ct         : int  0 1 0 0 0 0 0 0 1 1 ...
+##  $ temperature         : int  66 70 69 68 67 72 73 70 57 63 ...
+##  $ field_check_pressure: int  50 50 50 50 50 50 100 100 200 200 ...
+##  $ flight_num          : int  1 2 3 4 5 6 7 8 9 10 ...</code></pre>
+<ul>
+<li>test regression model with simple linear regression</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">reg</span>(<span class="dt">y =</span> launch<span class="op">$</span>distress_ct, <span class="dt">x =</span> launch[<span class="dv">2</span>])</code></pre>
+<pre><code>##                estimate
+## Intercept    3.69841270
+## temperature -0.04753968</code></pre>
+<ul>
+<li>use regression model with multiple regression</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">reg</span>(<span class="dt">y =</span> launch<span class="op">$</span>distress_ct, <span class="dt">x =</span> launch[<span class="dv">2</span><span class="op">:</span><span class="dv">4</span>])</code></pre>
+<pre><code>##                          estimate
+## Intercept             3.527093383
+## temperature          -0.051385940
+## field_check_pressure  0.001757009
+## flight_num            0.014292843</code></pre>
+<ul>
+<li>confirming the multiple regression result using the lm function (not in text)</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>(distress_ct <span class="op">~</span><span class="st"> </span>temperature <span class="op">+</span><span class="st"> </span>field_check_pressure, <span class="dt">data =</span> launch)
+model</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = distress_ct ~ temperature + field_check_pressure, 
+##     data = launch)
+## 
+## Coefficients:
+##          (Intercept)           temperature  field_check_pressure  
+##             3.329831             -0.048671              0.002939</code></pre>
+</div>
+<div id="example-predicting-medical-expenses" class="section level2">
+<h2><span class="header-section-number">6.4</span> Example: Predicting Medical Expenses</h2>
+<div id="step-1-collecting-data-1" class="section level3">
+<h3><span class="header-section-number">6.4.1</span> Step 1: collecting data</h3>
+<p>The insurance.csv file includes 1,338 examples of beneficiaries currently enrolled in the insurance plan, with features indicating characteristics of the patient as well as the total medical expenses charged to the plan for the calendar year. The features are:</p>
+<p>age: An integer indicating the age of the primary beneficiary (excluding those above 64 years, since they are generally covered by the government).</p>
+<p>sex: The policy holder’s gender, either male or female.</p>
+<p>bmi: The body mass index (BMI), which provides a sense of how over- or under-weight a person is relative to their height. BMI is equal to weight (in kilograms) divided by height (in meters) squared. An ideal BMI is within the range of 18.5 to 24.9.</p>
+<p>children: An integer indicating the number of children/dependents covered by the insurance plan.</p>
+<p>smoker: A yes or no categorical variable that indicates whether the insured regularly smokes tobacco.</p>
+<p>region: The beneficiary’s place of residence in the US, divided into four geographic regions: northeast, southeast, southwest, or northwest.</p>
+</div>
+<div id="step-2-exploring-and-preparing-the-data-4" class="section level3">
+<h3><span class="header-section-number">6.4.2</span> Step 2: Exploring and preparing the data</h3>
+<pre class="sourceCode r"><code class="sourceCode r">insurance &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;Chapter 06/insurance.csv&quot;</span>)
+<span class="kw">str</span>(insurance)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    1338 obs. of  7 variables:
+##  $ age     : int  19 18 28 33 32 31 46 37 37 60 ...
+##  $ sex     : Factor w/ 2 levels &quot;female&quot;,&quot;male&quot;: 1 2 2 2 2 1 1 1 2 1 ...
+##  $ bmi     : num  27.9 33.8 33 22.7 28.9 25.7 33.4 27.7 29.8 25.8 ...
+##  $ children: int  0 1 3 0 0 0 1 3 2 0 ...
+##  $ smoker  : Factor w/ 2 levels &quot;no&quot;,&quot;yes&quot;: 2 1 1 1 1 1 1 1 1 1 ...
+##  $ region  : Factor w/ 4 levels &quot;northeast&quot;,&quot;northwest&quot;,..: 4 3 3 2 2 3 3 2 1 2 ...
+##  $ expenses: num  16885 1726 4449 21984 3867 ...</code></pre>
+<ul>
+<li>summarize the charges variable</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(insurance<span class="op">$</span>expenses)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##    1122    4740    9382   13270   16640   63770</code></pre>
+<ul>
+<li>histogram of insurance charges</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(insurance<span class="op">$</span>expenses)</code></pre>
+<p><img src="Chapter06_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<ul>
+<li>table of region</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(insurance<span class="op">$</span>region)</code></pre>
+<pre><code>## 
+## northeast northwest southeast southwest 
+##       324       325       364       325</code></pre>
+<ul>
+<li>exploring relationships among features: correlation matrix</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cor</span>(insurance[<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;bmi&quot;</span>, <span class="st">&quot;children&quot;</span>, <span class="st">&quot;expenses&quot;</span>)])</code></pre>
+<pre><code>##                age        bmi   children   expenses
+## age      1.0000000 0.10934101 0.04246900 0.29900819
+## bmi      0.1093410 1.00000000 0.01264471 0.19857626
+## children 0.0424690 0.01264471 1.00000000 0.06799823
+## expenses 0.2990082 0.19857626 0.06799823 1.00000000</code></pre>
+<ul>
+<li>visualing relationships among features: scatterplot matrix</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pairs</span>(insurance[<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;bmi&quot;</span>, <span class="st">&quot;children&quot;</span>, <span class="st">&quot;expenses&quot;</span>)])</code></pre>
+<p><img src="Chapter06_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<ul>
+<li>more informative scatterplot matrix</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">pairs.panels</span>(insurance[<span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;bmi&quot;</span>, <span class="st">&quot;children&quot;</span>, <span class="st">&quot;expenses&quot;</span>)])</code></pre>
+<p><img src="Chapter06_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
+</div>
+<div id="step-3-training-a-model-on-the-data-4" class="section level3">
+<h3><span class="header-section-number">6.4.3</span> Step 3: Training a model on the data</h3>
+<pre class="sourceCode r"><code class="sourceCode r">ins_model &lt;-<span class="st"> </span><span class="kw">lm</span>(expenses <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>children <span class="op">+</span><span class="st"> </span>bmi <span class="op">+</span><span class="st"> </span>sex <span class="op">+</span><span class="st"> </span>smoker <span class="op">+</span><span class="st"> </span>region,
+                <span class="dt">data =</span> insurance)
+ins_model &lt;-<span class="st"> </span><span class="kw">lm</span>(expenses <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> insurance) <span class="co"># this is equivalent to above</span></code></pre>
+<ul>
+<li>see the estimated beta coefficients</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">ins_model</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = expenses ~ ., data = insurance)
+## 
+## Coefficients:
+##     (Intercept)              age          sexmale              bmi  
+##        -11941.6            256.8           -131.4            339.3  
+##        children        smokeryes  regionnorthwest  regionsoutheast  
+##           475.7          23847.5           -352.8          -1035.6  
+## regionsouthwest  
+##          -959.3</code></pre>
+</div>
+<div id="step-4-evaluating-model-performance-4" class="section level3">
+<h3><span class="header-section-number">6.4.4</span> Step 4: Evaluating model performance</h3>
+<ul>
+<li>see more detail about the estimated beta coefficients</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(ins_model)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = expenses ~ ., data = insurance)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -11302.7  -2850.9   -979.6   1383.9  29981.7 
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     -11941.6      987.8 -12.089  &lt; 2e-16 ***
+## age                256.8       11.9  21.586  &lt; 2e-16 ***
+## sexmale           -131.3      332.9  -0.395 0.693255    
+## bmi                339.3       28.6  11.864  &lt; 2e-16 ***
+## children           475.7      137.8   3.452 0.000574 ***
+## smokeryes        23847.5      413.1  57.723  &lt; 2e-16 ***
+## regionnorthwest   -352.8      476.3  -0.741 0.458976    
+## regionsoutheast  -1035.6      478.7  -2.163 0.030685 *  
+## regionsouthwest   -959.3      477.9  -2.007 0.044921 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 6062 on 1329 degrees of freedom
+## Multiple R-squared:  0.7509, Adjusted R-squared:  0.7494 
+## F-statistic: 500.9 on 8 and 1329 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="step-5-improving-model-performance-4" class="section level3">
+<h3><span class="header-section-number">6.4.5</span> Step 5: Improving model performance</h3>
+<ul>
+<li>add a higher-order “age” term</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">insurance<span class="op">$</span>age2 &lt;-<span class="st"> </span>insurance<span class="op">$</span>age<span class="op">^</span><span class="dv">2</span></code></pre>
+<ul>
+<li>add an indicator for BMI &gt;= 30</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">insurance<span class="op">$</span>bmi30 &lt;-<span class="st"> </span><span class="kw">ifelse</span>(insurance<span class="op">$</span>bmi <span class="op">&gt;=</span><span class="st"> </span><span class="dv">30</span>, <span class="dv">1</span>, <span class="dv">0</span>)</code></pre>
+<ul>
+<li>create final model</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">ins_model2 &lt;-<span class="st"> </span><span class="kw">lm</span>(expenses <span class="op">~</span><span class="st"> </span>age <span class="op">+</span><span class="st"> </span>age2 <span class="op">+</span><span class="st"> </span>children <span class="op">+</span><span class="st"> </span>bmi <span class="op">+</span><span class="st"> </span>sex <span class="op">+</span>
+<span class="st">                   </span>bmi30<span class="op">*</span>smoker <span class="op">+</span><span class="st"> </span>region, <span class="dt">data =</span> insurance)
+
+<span class="kw">summary</span>(ins_model2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = expenses ~ age + age2 + children + bmi + sex + bmi30 * 
+##     smoker + region, data = insurance)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -17297.1  -1656.0  -1262.7   -727.8  24161.6 
+## 
+## Coefficients:
+##                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)       139.0053  1363.1359   0.102 0.918792    
+## age               -32.6181    59.8250  -0.545 0.585690    
+## age2                3.7307     0.7463   4.999 6.54e-07 ***
+## children          678.6017   105.8855   6.409 2.03e-10 ***
+## bmi               119.7715    34.2796   3.494 0.000492 ***
+## sexmale          -496.7690   244.3713  -2.033 0.042267 *  
+## bmi30            -997.9355   422.9607  -2.359 0.018449 *  
+## smokeryes       13404.5952   439.9591  30.468  &lt; 2e-16 ***
+## regionnorthwest  -279.1661   349.2826  -0.799 0.424285    
+## regionsoutheast  -828.0345   351.6484  -2.355 0.018682 *  
+## regionsouthwest -1222.1619   350.5314  -3.487 0.000505 ***
+## bmi30:smokeryes 19810.1534   604.6769  32.762  &lt; 2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 4445 on 1326 degrees of freedom
+## Multiple R-squared:  0.8664, Adjusted R-squared:  0.8653 
+## F-statistic: 781.7 on 11 and 1326 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<div id="part-2-regression-trees-and-model-trees" class="section level2">
+<h2><span class="header-section-number">6.5</span> Part 2: Regression Trees and Model Trees</h2>
+<p>nown as regression trees, were introduced in the 1980s as part of the seminal Classification and Regression Tree (CART) algorithm. Despite the name, regression trees do not use linear regression methods as described earlier in this chapter, rather they make predictions based on the average value of examples that reach a leaf.</p>
+</div>
+<div id="understanding-regression-trees-and-model-trees" class="section level2">
+<h2><span class="header-section-number">6.6</span> Understanding regression trees and model trees</h2>
+</div>
+<div id="example-calculating-sdr" class="section level2">
+<h2><span class="header-section-number">6.7</span> Example: Calculating SDR</h2>
+<ul>
+<li>set up the data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">tee &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">7</span>)
+at1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">5</span>)
+at2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">6</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">7</span>)
+bt1 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>)
+bt2 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">7</span>, <span class="dv">7</span>)</code></pre>
+<ul>
+<li>compute the SDR</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sdr_a &lt;-<span class="st"> </span><span class="kw">sd</span>(tee) <span class="op">-</span><span class="st"> </span>(<span class="kw">length</span>(at1) <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(tee) <span class="op">*</span><span class="st"> </span><span class="kw">sd</span>(at1) <span class="op">+</span><span class="st"> </span><span class="kw">length</span>(at2) <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(tee) <span class="op">*</span><span class="st"> </span><span class="kw">sd</span>(at2))
+sdr_b &lt;-<span class="st"> </span><span class="kw">sd</span>(tee) <span class="op">-</span><span class="st"> </span>(<span class="kw">length</span>(bt1) <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(tee) <span class="op">*</span><span class="st"> </span><span class="kw">sd</span>(bt1) <span class="op">+</span><span class="st"> </span><span class="kw">length</span>(bt2) <span class="op">/</span><span class="st"> </span><span class="kw">length</span>(tee) <span class="op">*</span><span class="st"> </span><span class="kw">sd</span>(bt2))</code></pre>
+<ul>
+<li>compare the SDR for each split</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sdr_a</code></pre>
+<pre><code>## [1] 1.202815</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">sdr_b</code></pre>
+<pre><code>## [1] 1.392751</code></pre>
+</div>
+<div id="example-estimating-wine-quality" class="section level2">
+<h2><span class="header-section-number">6.8</span> Example: Estimating Wine Quality</h2>
+<div id="step-2-exploring-and-preparing-the-data-5" class="section level3">
+<h3><span class="header-section-number">6.8.1</span> Step 2: Exploring and preparing the data</h3>
+<pre class="sourceCode r"><code class="sourceCode r">wine &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;Chapter 06/whitewines.csv&quot;</span>)</code></pre>
+<ul>
+<li>examine the wine data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(wine)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    4898 obs. of  12 variables:
+##  $ fixed.acidity       : num  6.7 5.7 5.9 5.3 6.4 7 7.9 6.6 7 6.5 ...
+##  $ volatile.acidity    : num  0.62 0.22 0.19 0.47 0.29 0.14 0.12 0.38 0.16 0.37 ...
+##  $ citric.acid         : num  0.24 0.2 0.26 0.1 0.21 0.41 0.49 0.28 0.3 0.33 ...
+##  $ residual.sugar      : num  1.1 16 7.4 1.3 9.65 0.9 5.2 2.8 2.6 3.9 ...
+##  $ chlorides           : num  0.039 0.044 0.034 0.036 0.041 0.037 0.049 0.043 0.043 0.027 ...
+##  $ free.sulfur.dioxide : num  6 41 33 11 36 22 33 17 34 40 ...
+##  $ total.sulfur.dioxide: num  62 113 123 74 119 95 152 67 90 130 ...
+##  $ density             : num  0.993 0.999 0.995 0.991 0.993 ...
+##  $ pH                  : num  3.41 3.22 3.49 3.48 2.99 3.25 3.18 3.21 2.88 3.28 ...
+##  $ sulphates           : num  0.32 0.46 0.42 0.54 0.34 0.43 0.47 0.47 0.47 0.39 ...
+##  $ alcohol             : num  10.4 8.9 10.1 11.2 10.9 ...
+##  $ quality             : int  5 6 6 4 6 6 6 6 6 7 ...</code></pre>
+<ul>
+<li>the distribution of quality ratings</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(wine<span class="op">$</span>quality)</code></pre>
+<p><img src="Chapter06_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<ul>
+<li>summary statistics of the wine data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(wine)</code></pre>
+<pre><code>##  fixed.acidity    volatile.acidity  citric.acid     residual.sugar  
+##  Min.   : 3.800   Min.   :0.0800   Min.   :0.0000   Min.   : 0.600  
+##  1st Qu.: 6.300   1st Qu.:0.2100   1st Qu.:0.2700   1st Qu.: 1.700  
+##  Median : 6.800   Median :0.2600   Median :0.3200   Median : 5.200  
+##  Mean   : 6.855   Mean   :0.2782   Mean   :0.3342   Mean   : 6.391  
+##  3rd Qu.: 7.300   3rd Qu.:0.3200   3rd Qu.:0.3900   3rd Qu.: 9.900  
+##  Max.   :14.200   Max.   :1.1000   Max.   :1.6600   Max.   :65.800  
+##    chlorides       free.sulfur.dioxide total.sulfur.dioxide
+##  Min.   :0.00900   Min.   :  2.00      Min.   :  9.0       
+##  1st Qu.:0.03600   1st Qu.: 23.00      1st Qu.:108.0       
+##  Median :0.04300   Median : 34.00      Median :134.0       
+##  Mean   :0.04577   Mean   : 35.31      Mean   :138.4       
+##  3rd Qu.:0.05000   3rd Qu.: 46.00      3rd Qu.:167.0       
+##  Max.   :0.34600   Max.   :289.00      Max.   :440.0       
+##     density             pH          sulphates         alcohol     
+##  Min.   :0.9871   Min.   :2.720   Min.   :0.2200   Min.   : 8.00  
+##  1st Qu.:0.9917   1st Qu.:3.090   1st Qu.:0.4100   1st Qu.: 9.50  
+##  Median :0.9937   Median :3.180   Median :0.4700   Median :10.40  
+##  Mean   :0.9940   Mean   :3.188   Mean   :0.4898   Mean   :10.51  
+##  3rd Qu.:0.9961   3rd Qu.:3.280   3rd Qu.:0.5500   3rd Qu.:11.40  
+##  Max.   :1.0390   Max.   :3.820   Max.   :1.0800   Max.   :14.20  
+##     quality     
+##  Min.   :3.000  
+##  1st Qu.:5.000  
+##  Median :6.000  
+##  Mean   :5.878  
+##  3rd Qu.:6.000  
+##  Max.   :9.000</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">wine_train &lt;-<span class="st"> </span>wine[<span class="dv">1</span><span class="op">:</span><span class="dv">3750</span>, ]
+wine_test &lt;-<span class="st"> </span>wine[<span class="dv">3751</span><span class="op">:</span><span class="dv">4898</span>, ]</code></pre>
+</div>
+<div id="step-3-training-a-model-on-the-data-5" class="section level3">
+<h3><span class="header-section-number">6.8.2</span> Step 3: Training a model on the data</h3>
+<ul>
+<li>regression tree using rpart</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">m.rpart &lt;-<span class="st"> </span><span class="kw">rpart</span>(quality <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> wine_train)</code></pre>
+<ul>
+<li>get basic information about the tree</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">m.rpart</code></pre>
+<pre><code>## n= 3750 
+## 
+## node), split, n, deviance, yval
+##       * denotes terminal node
+## 
+##  1) root 3750 2945.53200 5.870933  
+##    2) alcohol&lt; 10.85 2372 1418.86100 5.604975  
+##      4) volatile.acidity&gt;=0.2275 1611  821.30730 5.432030  
+##        8) volatile.acidity&gt;=0.3025 688  278.97670 5.255814 *
+##        9) volatile.acidity&lt; 0.3025 923  505.04230 5.563380 *
+##      5) volatile.acidity&lt; 0.2275 761  447.36400 5.971091 *
+##    3) alcohol&gt;=10.85 1378 1070.08200 6.328737  
+##      6) free.sulfur.dioxide&lt; 10.5 84   95.55952 5.369048 *
+##      7) free.sulfur.dioxide&gt;=10.5 1294  892.13600 6.391036  
+##       14) alcohol&lt; 11.76667 629  430.11130 6.173291  
+##         28) volatile.acidity&gt;=0.465 11   10.72727 4.545455 *
+##         29) volatile.acidity&lt; 0.465 618  389.71680 6.202265 *
+##       15) alcohol&gt;=11.76667 665  403.99400 6.596992 *</code></pre>
+<ul>
+<li>get more detailed information about the tree</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(m.rpart)</code></pre>
+<pre><code>## Call:
+## rpart(formula = quality ~ ., data = wine_train)
+##   n= 3750 
+## 
+##           CP nsplit rel error    xerror       xstd
+## 1 0.15501053      0 1.0000000 1.0006401 0.02444955
+## 2 0.05098911      1 0.8449895 0.8458444 0.02332215
+## 3 0.02796998      2 0.7940004 0.8045001 0.02276382
+## 4 0.01970128      3 0.7660304 0.7850044 0.02181383
+## 5 0.01265926      4 0.7463291 0.7656874 0.02109208
+## 6 0.01007193      5 0.7336698 0.7651232 0.02112280
+## 7 0.01000000      6 0.7235979 0.7617566 0.02108417
+## 
+## Variable importance
+##              alcohol              density     volatile.acidity 
+##                   34                   21                   15 
+##            chlorides total.sulfur.dioxide  free.sulfur.dioxide 
+##                   11                    7                    6 
+##       residual.sugar            sulphates          citric.acid 
+##                    3                    1                    1 
+## 
+## Node number 1: 3750 observations,    complexity param=0.1550105
+##   mean=5.870933, MSE=0.7854751 
+##   left son=2 (2372 obs) right son=3 (1378 obs)
+##   Primary splits:
+##       alcohol              &lt; 10.85    to the left,  improve=0.15501050, (0 missing)
+##       density              &lt; 0.992035 to the right, improve=0.10915940, (0 missing)
+##       chlorides            &lt; 0.0395   to the right, improve=0.07682258, (0 missing)
+##       total.sulfur.dioxide &lt; 158.5    to the right, improve=0.04089663, (0 missing)
+##       citric.acid          &lt; 0.235    to the left,  improve=0.03636458, (0 missing)
+##   Surrogate splits:
+##       density              &lt; 0.991995 to the right, agree=0.869, adj=0.644, (0 split)
+##       chlorides            &lt; 0.0375   to the right, agree=0.757, adj=0.339, (0 split)
+##       total.sulfur.dioxide &lt; 103.5    to the right, agree=0.690, adj=0.155, (0 split)
+##       residual.sugar       &lt; 5.375    to the right, agree=0.667, adj=0.094, (0 split)
+##       sulphates            &lt; 0.345    to the right, agree=0.647, adj=0.038, (0 split)
+## 
+## Node number 2: 2372 observations,    complexity param=0.05098911
+##   mean=5.604975, MSE=0.5981709 
+##   left son=4 (1611 obs) right son=5 (761 obs)
+##   Primary splits:
+##       volatile.acidity    &lt; 0.2275   to the right, improve=0.10585250, (0 missing)
+##       free.sulfur.dioxide &lt; 13.5     to the left,  improve=0.03390500, (0 missing)
+##       citric.acid         &lt; 0.235    to the left,  improve=0.03204075, (0 missing)
+##       alcohol             &lt; 10.11667 to the left,  improve=0.03136524, (0 missing)
+##       chlorides           &lt; 0.0585   to the right, improve=0.01633599, (0 missing)
+##   Surrogate splits:
+##       pH                   &lt; 3.485    to the left,  agree=0.694, adj=0.047, (0 split)
+##       sulphates            &lt; 0.755    to the left,  agree=0.685, adj=0.020, (0 split)
+##       total.sulfur.dioxide &lt; 105.5    to the right, agree=0.683, adj=0.011, (0 split)
+##       residual.sugar       &lt; 0.75     to the right, agree=0.681, adj=0.007, (0 split)
+##       chlorides            &lt; 0.0285   to the right, agree=0.680, adj=0.003, (0 split)
+## 
+## Node number 3: 1378 observations,    complexity param=0.02796998
+##   mean=6.328737, MSE=0.7765472 
+##   left son=6 (84 obs) right son=7 (1294 obs)
+##   Primary splits:
+##       free.sulfur.dioxide  &lt; 10.5     to the left,  improve=0.07699080, (0 missing)
+##       alcohol              &lt; 11.76667 to the left,  improve=0.06210660, (0 missing)
+##       total.sulfur.dioxide &lt; 67.5     to the left,  improve=0.04438619, (0 missing)
+##       residual.sugar       &lt; 1.375    to the left,  improve=0.02905351, (0 missing)
+##       fixed.acidity        &lt; 7.35     to the right, improve=0.02613259, (0 missing)
+##   Surrogate splits:
+##       total.sulfur.dioxide &lt; 53.5     to the left,  agree=0.952, adj=0.214, (0 split)
+##       volatile.acidity     &lt; 0.875    to the right, agree=0.940, adj=0.024, (0 split)
+## 
+## Node number 4: 1611 observations,    complexity param=0.01265926
+##   mean=5.43203, MSE=0.5098121 
+##   left son=8 (688 obs) right son=9 (923 obs)
+##   Primary splits:
+##       volatile.acidity    &lt; 0.3025   to the right, improve=0.04540111, (0 missing)
+##       alcohol             &lt; 10.05    to the left,  improve=0.03874403, (0 missing)
+##       free.sulfur.dioxide &lt; 13.5     to the left,  improve=0.03338886, (0 missing)
+##       chlorides           &lt; 0.0495   to the right, improve=0.02574623, (0 missing)
+##       citric.acid         &lt; 0.195    to the left,  improve=0.02327981, (0 missing)
+##   Surrogate splits:
+##       citric.acid          &lt; 0.215    to the left,  agree=0.633, adj=0.141, (0 split)
+##       free.sulfur.dioxide  &lt; 20.5     to the left,  agree=0.600, adj=0.063, (0 split)
+##       chlorides            &lt; 0.0595   to the right, agree=0.593, adj=0.047, (0 split)
+##       residual.sugar       &lt; 1.15     to the left,  agree=0.583, adj=0.023, (0 split)
+##       total.sulfur.dioxide &lt; 219.25   to the right, agree=0.582, adj=0.022, (0 split)
+## 
+## Node number 5: 761 observations
+##   mean=5.971091, MSE=0.5878633 
+## 
+## Node number 6: 84 observations
+##   mean=5.369048, MSE=1.137613 
+## 
+## Node number 7: 1294 observations,    complexity param=0.01970128
+##   mean=6.391036, MSE=0.6894405 
+##   left son=14 (629 obs) right son=15 (665 obs)
+##   Primary splits:
+##       alcohol              &lt; 11.76667 to the left,  improve=0.06504696, (0 missing)
+##       chlorides            &lt; 0.0395   to the right, improve=0.02758705, (0 missing)
+##       fixed.acidity        &lt; 7.35     to the right, improve=0.02750932, (0 missing)
+##       pH                   &lt; 3.055    to the left,  improve=0.02307356, (0 missing)
+##       total.sulfur.dioxide &lt; 191.5    to the right, improve=0.02186818, (0 missing)
+##   Surrogate splits:
+##       density              &lt; 0.990885 to the right, agree=0.720, adj=0.424, (0 split)
+##       volatile.acidity     &lt; 0.2675   to the left,  agree=0.637, adj=0.253, (0 split)
+##       chlorides            &lt; 0.0365   to the right, agree=0.630, adj=0.238, (0 split)
+##       residual.sugar       &lt; 1.475    to the left,  agree=0.575, adj=0.126, (0 split)
+##       total.sulfur.dioxide &lt; 128.5    to the right, agree=0.574, adj=0.124, (0 split)
+## 
+## Node number 8: 688 observations
+##   mean=5.255814, MSE=0.4054895 
+## 
+## Node number 9: 923 observations
+##   mean=5.56338, MSE=0.5471747 
+## 
+## Node number 14: 629 observations,    complexity param=0.01007193
+##   mean=6.173291, MSE=0.6838017 
+##   left son=28 (11 obs) right son=29 (618 obs)
+##   Primary splits:
+##       volatile.acidity     &lt; 0.465    to the right, improve=0.06897561, (0 missing)
+##       total.sulfur.dioxide &lt; 200      to the right, improve=0.04223066, (0 missing)
+##       residual.sugar       &lt; 0.975    to the left,  improve=0.03061714, (0 missing)
+##       fixed.acidity        &lt; 7.35     to the right, improve=0.02978501, (0 missing)
+##       sulphates            &lt; 0.575    to the left,  improve=0.02165970, (0 missing)
+##   Surrogate splits:
+##       citric.acid          &lt; 0.045    to the left,  agree=0.986, adj=0.182, (0 split)
+##       total.sulfur.dioxide &lt; 279.25   to the right, agree=0.986, adj=0.182, (0 split)
+## 
+## Node number 15: 665 observations
+##   mean=6.596992, MSE=0.6075098 
+## 
+## Node number 28: 11 observations
+##   mean=4.545455, MSE=0.9752066 
+## 
+## Node number 29: 618 observations
+##   mean=6.202265, MSE=0.6306098</code></pre>
+<ul>
+<li>a basic decision tree diagram</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rpart.plot</span>(m.rpart, <span class="dt">digits =</span> <span class="dv">3</span>)</code></pre>
+<p><img src="Chapter06_files/figure-html/unnamed-chunk-35-1.png" width="672" /></p>
+<ul>
+<li>a few adjustments to the diagram</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">rpart.plot</span>(m.rpart, <span class="dt">digits =</span> <span class="dv">4</span>, <span class="dt">fallen.leaves =</span> <span class="ot">TRUE</span>, <span class="dt">type =</span> <span class="dv">3</span>, <span class="dt">extra =</span> <span class="dv">101</span>)</code></pre>
+<p><img src="Chapter06_files/figure-html/unnamed-chunk-36-1.png" width="672" /></p>
+</div>
+<div id="step-4-evaluate-model-performance" class="section level3">
+<h3><span class="header-section-number">6.8.3</span> Step 4: Evaluate model performance</h3>
+<ul>
+<li>generate predictions for the testing dataset</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">p.rpart &lt;-<span class="st"> </span><span class="kw">predict</span>(m.rpart, wine_test)</code></pre>
+<ul>
+<li>compare the distribution of predicted values vs. actual values</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(p.rpart)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   4.545   5.563   5.971   5.893   6.202   6.597</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(wine_test<span class="op">$</span>quality)</code></pre>
+<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+##   3.000   5.000   6.000   5.901   6.000   9.000</code></pre>
+<ul>
+<li>compare the correlation</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">cor</span>(p.rpart, wine_test<span class="op">$</span>quality)</code></pre>
+<pre><code>## [1] 0.5369525</code></pre>
+<ul>
+<li>function to calculate the mean absolute error</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">MAE &lt;-<span class="st"> </span><span class="cf">function</span>(actual, predicted) {
+  <span class="kw">mean</span>(<span class="kw">abs</span>(actual <span class="op">-</span><span class="st"> </span>predicted))  
+}</code></pre>
+<ul>
+<li>mean absolute error between predicted and actual values</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MAE</span>(p.rpart, wine_test<span class="op">$</span>quality)</code></pre>
+<pre><code>## [1] 0.5872652</code></pre>
+<ul>
+<li>mean absolute error between actual values and mean value</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(wine_train<span class="op">$</span>quality) <span class="co"># result = 5.87</span></code></pre>
+<pre><code>## [1] 5.870933</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">MAE</span>(<span class="fl">5.87</span>, wine_test<span class="op">$</span>quality)</code></pre>
+<pre><code>## [1] 0.6722474</code></pre>
+</div>
+<div id="step-5-improving-model-performance-5" class="section level3">
+<h3><span class="header-section-number">6.8.4</span> Step 5: Improving model performance</h3>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="co"># # train a M5&#39; Model Tree</span>
+<span class="co"># m.m5p &lt;- M5P(quality ~ ., data = wine_train)</span>
+<span class="co"># </span>
+<span class="co"># # display the tree</span>
+<span class="co"># m.m5p</span>
+<span class="co"># </span>
+<span class="co"># # get a summary of the model&#39;s performance</span>
+<span class="co"># summary(m.m5p)</span>
+<span class="co"># </span>
+<span class="co"># # generate predictions for the model</span>
+<span class="co"># p.m5p &lt;- predict(m.m5p, wine_test)</span>
+<span class="co"># </span>
+<span class="co"># # summary statistics about the predictions</span>
+<span class="co"># summary(p.m5p)</span>
+<span class="co"># </span>
+<span class="co"># # correlation between the predicted and true values</span>
+<span class="co"># cor(p.m5p, wine_test$quality)</span>
+<span class="co"># </span>
+<span class="co"># # mean absolute error of predicted and true values</span>
+<span class="co"># # (uses a custom function defined above)</span>
+<span class="co"># MAE(wine_test$quality, p.m5p)</span></code></pre>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="classification-using-decision-trees-and-rules.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="neural-networks-and-support-vector-machines.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/mnblanco/MLR/edit/master/Chapter06.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["mlr.pdf", "mlr.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>

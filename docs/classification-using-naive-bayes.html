@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Chapter 4 Classification using Naive Bayes | Machine Learning with R Solutions</title>
+  <meta name="description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz.">
+  <meta name="generator" content="bookdown  and GitBook 2.6.7">
+
+  <meta property="og:title" content="Chapter 4 Classification using Naive Bayes | Machine Learning with R Solutions" />
+  <meta property="og:type" content="book" />
+  
+  
+  <meta property="og:description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 4 Classification using Naive Bayes | Machine Learning with R Solutions" />
+  
+  <meta name="twitter:description" content="This contains the solutions to the exercises in the book, Machine Learning with R, by Brett Lantz." />
+  
+
+<meta name="author" content="Marjorie Blanco">
+
+
+<meta name="date" content="2019-01-02">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="classification-using-nearest-neighbors.html">
+<link rel="next" href="classification-using-decision-trees-and-rules.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Machine Learning with R Solution</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Welcome</a></li>
+<li class="chapter" data-level="1" data-path="introducing-machine-learning.html"><a href="introducing-machine-learning.html"><i class="fa fa-check"></i><b>1</b> Introducing Machine Learning</a></li>
+<li class="chapter" data-level="2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html"><i class="fa fa-check"></i><b>2</b> Managing and Understanding Data</a><ul>
+<li class="chapter" data-level="2.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#r-data-structures"><i class="fa fa-check"></i><b>2.1</b> R data structures</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#vectors"><i class="fa fa-check"></i><b>2.1.1</b> Vectors</a></li>
+<li class="chapter" data-level="2.1.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#factors"><i class="fa fa-check"></i><b>2.1.2</b> Factors</a></li>
+<li class="chapter" data-level="2.1.3" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#lists"><i class="fa fa-check"></i><b>2.1.3</b> Lists</a></li>
+<li class="chapter" data-level="2.1.4" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#data-frames"><i class="fa fa-check"></i><b>2.1.4</b> Data frames</a></li>
+<li class="chapter" data-level="2.1.5" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#matrixes"><i class="fa fa-check"></i><b>2.1.5</b> Matrixes</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#managing-data-with-r"><i class="fa fa-check"></i><b>2.2</b> Managing data with R</a><ul>
+<li class="chapter" data-level="2.2.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#saving-loading-and-removing-r-data-structures"><i class="fa fa-check"></i><b>2.2.1</b> saving, loading, and removing R data structures</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-and-understanding-data"><i class="fa fa-check"></i><b>2.3</b> Exploring and understanding data</a></li>
+<li class="chapter" data-level="2.4" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#data-exploration-example-using-used-car-data"><i class="fa fa-check"></i><b>2.4</b> data exploration example using used car data</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-the-structure-of-data"><i class="fa fa-check"></i><b>2.4.1</b> Exploring the structure of data</a></li>
+<li class="chapter" data-level="2.4.2" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-numeric-variables"><i class="fa fa-check"></i><b>2.4.2</b> Exploring numeric variables</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-categorical-variables"><i class="fa fa-check"></i><b>2.5</b> Exploring categorical variables</a><ul>
+<li class="chapter" data-level="2.5.1" data-path="managing-and-understanding-data.html"><a href="managing-and-understanding-data.html#exploring-relationships-between-variables"><i class="fa fa-check"></i><b>2.5.1</b> Exploring relationships between variables</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html"><i class="fa fa-check"></i><b>3</b> Classification using Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#lazy-learning"><i class="fa fa-check"></i><b>3.1</b> Lazy Learning</a></li>
+<li class="chapter" data-level="3.2" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#example-classifying-cancer-samples"><i class="fa fa-check"></i><b>3.2</b> Example: Classifying Cancer Samples</a><ul>
+<li class="chapter" data-level="3.2.1" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-1-collecting-data"><i class="fa fa-check"></i><b>3.2.1</b> Step 1: collecting data</a></li>
+<li class="chapter" data-level="3.2.2" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-2-exploring-and-preparing-the-data"><i class="fa fa-check"></i><b>3.2.2</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="3.2.3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-3-training-a-model-on-the-data"><i class="fa fa-check"></i><b>3.2.3</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="3.2.4" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-4-evaluating-model-performance"><i class="fa fa-check"></i><b>3.2.4</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="3.2.5" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#step-5-improving-model-performance"><i class="fa fa-check"></i><b>3.2.5</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="3.3" data-path="classification-using-nearest-neighbors.html"><a href="classification-using-nearest-neighbors.html#summary"><i class="fa fa-check"></i><b>3.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html"><i class="fa fa-check"></i><b>4</b> Classification using Naive Bayes</a><ul>
+<li class="chapter" data-level="4.1" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#naive-bayes"><i class="fa fa-check"></i><b>4.1</b> Naive Bayes</a></li>
+<li class="chapter" data-level="4.2" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#example-filtering-spam-sms-messages"><i class="fa fa-check"></i><b>4.2</b> Example: Filtering spam SMS messages</a><ul>
+<li class="chapter" data-level="4.2.1" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-2-exploring-and-preparing-the-data-1"><i class="fa fa-check"></i><b>4.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="4.2.2" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-3-training-a-model-on-the-data-1"><i class="fa fa-check"></i><b>4.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="4.2.3" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-4-evaluating-model-performance-1"><i class="fa fa-check"></i><b>4.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="4.2.4" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#step-5-improving-model-performance-1"><i class="fa fa-check"></i><b>4.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="4.3" data-path="classification-using-naive-bayes.html"><a href="classification-using-naive-bayes.html#summary-1"><i class="fa fa-check"></i><b>4.3</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html"><i class="fa fa-check"></i><b>5</b> Classification using Decision Trees and Rules</a><ul>
+<li class="chapter" data-level="5.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#part-1-decision-trees"><i class="fa fa-check"></i><b>5.1</b> Part 1: Decision Trees</a></li>
+<li class="chapter" data-level="5.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#understanding-decision-trees"><i class="fa fa-check"></i><b>5.2</b> Understanding Decision Trees</a></li>
+<li class="chapter" data-level="5.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#example-identifying-risky-bank-loans"><i class="fa fa-check"></i><b>5.3</b> Example: Identifying Risky Bank Loans</a><ul>
+<li class="chapter" data-level="5.3.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-2-exploring-and-preparing-the-data-2"><i class="fa fa-check"></i><b>5.3.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="5.3.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-3-training-a-model-on-the-data-2"><i class="fa fa-check"></i><b>5.3.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="5.3.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-4-evaluating-model-performance-2"><i class="fa fa-check"></i><b>5.3.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="5.3.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-5-improving-model-performance-2"><i class="fa fa-check"></i><b>5.3.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#boosting-the-accuracy-of-decision-trees"><i class="fa fa-check"></i><b>5.4</b> Boosting the accuracy of decision trees</a></li>
+<li class="chapter" data-level="5.5" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#making-some-mistakes-more-costly-than-others"><i class="fa fa-check"></i><b>5.5</b> Making some mistakes more costly than others</a></li>
+<li class="chapter" data-level="5.6" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#part-2-rule-learners"><i class="fa fa-check"></i><b>5.6</b> Part 2: Rule Learners</a></li>
+<li class="chapter" data-level="5.7" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#example-identifying-poisonous-mushrooms"><i class="fa fa-check"></i><b>5.7</b> Example: Identifying Poisonous Mushrooms</a><ul>
+<li class="chapter" data-level="5.7.1" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-2-exploring-and-preparing-the-data-3"><i class="fa fa-check"></i><b>5.7.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="5.7.2" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-3-training-a-model-on-the-data-3"><i class="fa fa-check"></i><b>5.7.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="5.7.3" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-4-evaluating-model-performance-3"><i class="fa fa-check"></i><b>5.7.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="5.7.4" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#step-5-improving-model-performance-3"><i class="fa fa-check"></i><b>5.7.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="5.8" data-path="classification-using-decision-trees-and-rules.html"><a href="classification-using-decision-trees-and-rules.html#summary-2"><i class="fa fa-check"></i><b>5.8</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="regression-methods.html"><a href="regression-methods.html"><i class="fa fa-check"></i><b>6</b> Regression Methods</a><ul>
+<li class="chapter" data-level="6.1" data-path="regression-methods.html"><a href="regression-methods.html#part-1-linear-regression"><i class="fa fa-check"></i><b>6.1</b> Part 1: Linear Regression</a></li>
+<li class="chapter" data-level="6.2" data-path="regression-methods.html"><a href="regression-methods.html#understanding-regression"><i class="fa fa-check"></i><b>6.2</b> Understanding regression</a></li>
+<li class="chapter" data-level="6.3" data-path="regression-methods.html"><a href="regression-methods.html#example-space-shuttle-launch-data"><i class="fa fa-check"></i><b>6.3</b> Example: Space Shuttle Launch Data</a></li>
+<li class="chapter" data-level="6.4" data-path="regression-methods.html"><a href="regression-methods.html#example-predicting-medical-expenses"><i class="fa fa-check"></i><b>6.4</b> Example: Predicting Medical Expenses</a><ul>
+<li class="chapter" data-level="6.4.1" data-path="regression-methods.html"><a href="regression-methods.html#step-1-collecting-data-1"><i class="fa fa-check"></i><b>6.4.1</b> Step 1: collecting data</a></li>
+<li class="chapter" data-level="6.4.2" data-path="regression-methods.html"><a href="regression-methods.html#step-2-exploring-and-preparing-the-data-4"><i class="fa fa-check"></i><b>6.4.2</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="6.4.3" data-path="regression-methods.html"><a href="regression-methods.html#step-3-training-a-model-on-the-data-4"><i class="fa fa-check"></i><b>6.4.3</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="6.4.4" data-path="regression-methods.html"><a href="regression-methods.html#step-4-evaluating-model-performance-4"><i class="fa fa-check"></i><b>6.4.4</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="6.4.5" data-path="regression-methods.html"><a href="regression-methods.html#step-5-improving-model-performance-4"><i class="fa fa-check"></i><b>6.4.5</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="6.5" data-path="regression-methods.html"><a href="regression-methods.html#part-2-regression-trees-and-model-trees"><i class="fa fa-check"></i><b>6.5</b> Part 2: Regression Trees and Model Trees</a></li>
+<li class="chapter" data-level="6.6" data-path="regression-methods.html"><a href="regression-methods.html#understanding-regression-trees-and-model-trees"><i class="fa fa-check"></i><b>6.6</b> Understanding regression trees and model trees</a></li>
+<li class="chapter" data-level="6.7" data-path="regression-methods.html"><a href="regression-methods.html#example-calculating-sdr"><i class="fa fa-check"></i><b>6.7</b> Example: Calculating SDR</a></li>
+<li class="chapter" data-level="6.8" data-path="regression-methods.html"><a href="regression-methods.html#example-estimating-wine-quality"><i class="fa fa-check"></i><b>6.8</b> Example: Estimating Wine Quality</a><ul>
+<li class="chapter" data-level="6.8.1" data-path="regression-methods.html"><a href="regression-methods.html#step-2-exploring-and-preparing-the-data-5"><i class="fa fa-check"></i><b>6.8.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="6.8.2" data-path="regression-methods.html"><a href="regression-methods.html#step-3-training-a-model-on-the-data-5"><i class="fa fa-check"></i><b>6.8.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="6.8.3" data-path="regression-methods.html"><a href="regression-methods.html#step-4-evaluate-model-performance"><i class="fa fa-check"></i><b>6.8.3</b> Step 4: Evaluate model performance</a></li>
+<li class="chapter" data-level="6.8.4" data-path="regression-methods.html"><a href="regression-methods.html#step-5-improving-model-performance-5"><i class="fa fa-check"></i><b>6.8.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html"><i class="fa fa-check"></i><b>7</b> Neural Networks and Support Vector Machines</a><ul>
+<li class="chapter" data-level="7.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#part-1-neural-networks"><i class="fa fa-check"></i><b>7.1</b> Part 1: Neural Networks</a></li>
+<li class="chapter" data-level="7.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#example-modeling-the-strength-of-concrete"><i class="fa fa-check"></i><b>7.2</b> Example: Modeling the Strength of Concrete</a><ul>
+<li class="chapter" data-level="7.2.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-2-exploring-and-preparing-the-data-6"><i class="fa fa-check"></i><b>7.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="7.2.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-3-training-a-model-on-the-data-6"><i class="fa fa-check"></i><b>7.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="7.2.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-4-evaluating-model-performance-5"><i class="fa fa-check"></i><b>7.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="7.2.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-5-improving-model-performance-6"><i class="fa fa-check"></i><b>7.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#part-2-support-vector-machines"><i class="fa fa-check"></i><b>7.3</b> Part 2: Support Vector Machines</a></li>
+<li class="chapter" data-level="7.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#example-optical-character-recognition"><i class="fa fa-check"></i><b>7.4</b> Example: Optical Character Recognition</a><ul>
+<li class="chapter" data-level="7.4.1" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-2-exploring-and-preparing-the-data-7"><i class="fa fa-check"></i><b>7.4.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="7.4.2" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-3-training-a-model-on-the-data-7"><i class="fa fa-check"></i><b>7.4.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="7.4.3" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-4-evaluating-model-performance-6"><i class="fa fa-check"></i><b>7.4.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="7.4.4" data-path="neural-networks-and-support-vector-machines.html"><a href="neural-networks-and-support-vector-machines.html#step-5-improving-model-performance-7"><i class="fa fa-check"></i><b>7.4.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="association-rules.html"><a href="association-rules.html"><i class="fa fa-check"></i><b>8</b> Association Rules</a><ul>
+<li class="chapter" data-level="8.1" data-path="association-rules.html"><a href="association-rules.html#market-basket-analysis"><i class="fa fa-check"></i><b>8.1</b> Market Basket Analysis</a></li>
+<li class="chapter" data-level="8.2" data-path="association-rules.html"><a href="association-rules.html#example-identifying-frequently-purchased-groceries"><i class="fa fa-check"></i><b>8.2</b> Example: Identifying Frequently-Purchased Groceries</a><ul>
+<li class="chapter" data-level="8.2.1" data-path="association-rules.html"><a href="association-rules.html#step-2-exploring-and-preparing-the-data-8"><i class="fa fa-check"></i><b>8.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="8.2.2" data-path="association-rules.html"><a href="association-rules.html#step-3-training-a-model-on-the-data-8"><i class="fa fa-check"></i><b>8.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="8.2.3" data-path="association-rules.html"><a href="association-rules.html#step-4-evaluating-model-performance-7"><i class="fa fa-check"></i><b>8.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="8.2.4" data-path="association-rules.html"><a href="association-rules.html#step-5-improving-model-performance-8"><i class="fa fa-check"></i><b>8.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html"><i class="fa fa-check"></i><b>9</b> Clustering with k-means</a><ul>
+<li class="chapter" data-level="9.1" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#k-means"><i class="fa fa-check"></i><b>9.1</b> k-means</a></li>
+<li class="chapter" data-level="9.2" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#example-finding-teen-market-segments"><i class="fa fa-check"></i><b>9.2</b> Example: Finding Teen Market Segments</a><ul>
+<li class="chapter" data-level="9.2.1" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-2-exploring-and-preparing-the-data-9"><i class="fa fa-check"></i><b>9.2.1</b> Step 2: Exploring and preparing the data</a></li>
+<li class="chapter" data-level="9.2.2" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-3-training-a-model-on-the-data-9"><i class="fa fa-check"></i><b>9.2.2</b> Step 3: Training a model on the data</a></li>
+<li class="chapter" data-level="9.2.3" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-4-evaluating-model-performance-8"><i class="fa fa-check"></i><b>9.2.3</b> Step 4: Evaluating model performance</a></li>
+<li class="chapter" data-level="9.2.4" data-path="clustering-with-k-means.html"><a href="clustering-with-k-means.html#step-5-improving-model-performance-9"><i class="fa fa-check"></i><b>9.2.4</b> Step 5: Improving model performance</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="10" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html"><i class="fa fa-check"></i><b>10</b> Evaluating Model Performance</a><ul>
+<li class="chapter" data-level="10.1" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#confusion-matrixes-in-r"><i class="fa fa-check"></i><b>10.1</b> Confusion matrixes in R</a></li>
+<li class="chapter" data-level="10.2" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#beyond-accuracy-other-performance-measures"><i class="fa fa-check"></i><b>10.2</b> Beyond accuracy: other performance measures</a></li>
+<li class="chapter" data-level="10.3" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#visualizing-performance-tradeoffs"><i class="fa fa-check"></i><b>10.3</b> Visualizing Performance Tradeoffs</a></li>
+<li class="chapter" data-level="10.4" data-path="evaluating-model-performance.html"><a href="evaluating-model-performance.html#estimating-future-performance"><i class="fa fa-check"></i><b>10.4</b> Estimating Future Performance</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/mnblanco/MLR" target="blank">Machine Learning with R Solution</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Machine Learning with R Solutions</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="classification-using-naive-bayes" class="section level1">
+<h1><span class="header-section-number">Chapter 4</span> Classification using Naive Bayes</h1>
+<div id="naive-bayes" class="section level2">
+<h2><span class="header-section-number">4.1</span> Naive Bayes</h2>
+</div>
+<div id="example-filtering-spam-sms-messages" class="section level2">
+<h2><span class="header-section-number">4.2</span> Example: Filtering spam SMS messages</h2>
+<div id="step-2-exploring-and-preparing-the-data-1" class="section level3">
+<h3><span class="header-section-number">4.2.1</span> Step 2: Exploring and preparing the data</h3>
+<ul>
+<li>read the sms data into the sms data frame</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_raw &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;Chapter 04/sms_spam.csv&quot;</span>)</code></pre>
+<ul>
+<li>examine the structure of the sms data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(sms_raw)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    5559 obs. of  2 variables:
+##  $ type: Factor w/ 2 levels &quot;ham&quot;,&quot;spam&quot;: 1 1 1 2 2 1 1 1 2 1 ...
+##  $ text: Factor w/ 5156 levels &quot; #  in mca. But not conform.&quot;,..: 1651 2566 257 626 3308 190 357 3392 2726 1079 ...</code></pre>
+<ul>
+<li>convert spam/ham to factor.</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_raw<span class="op">$</span>type &lt;-<span class="st"> </span><span class="kw">factor</span>(sms_raw<span class="op">$</span>type)</code></pre>
+<ul>
+<li>examine the type variable more carefully</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(sms_raw<span class="op">$</span>type)</code></pre>
+<pre><code>##  Factor w/ 2 levels &quot;ham&quot;,&quot;spam&quot;: 1 1 1 2 2 1 1 1 2 1 ...</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">table</span>(sms_raw<span class="op">$</span>type)</code></pre>
+<pre><code>## 
+##  ham spam 
+## 4812  747</code></pre>
+<ul>
+<li>build a corpus using the text mining (tm) package</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_corpus &lt;-<span class="st"> </span><span class="kw">VCorpus</span>(<span class="kw">VectorSource</span>(sms_raw<span class="op">$</span>text))</code></pre>
+<ul>
+<li>examine the sms corpus</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(sms_corpus)</code></pre>
+<pre><code>## &lt;&lt;VCorpus&gt;&gt;
+## Metadata:  corpus specific: 0, document level (indexed): 0
+## Content:  documents: 5559</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">inspect</span>(sms_corpus[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>])</code></pre>
+<pre><code>## &lt;&lt;VCorpus&gt;&gt;
+## Metadata:  corpus specific: 0, document level (indexed): 0
+## Content:  documents: 2
+## 
+## [[1]]
+## &lt;&lt;PlainTextDocument&gt;&gt;
+## Metadata:  7
+## Content:  chars: 49
+## 
+## [[2]]
+## &lt;&lt;PlainTextDocument&gt;&gt;
+## Metadata:  7
+## Content:  chars: 23</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">as.character</span>(sms_corpus[[<span class="dv">1</span>]])</code></pre>
+<pre><code>## [1] &quot;Hope you are having a good week. Just checking in&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(sms_corpus[<span class="dv">1</span><span class="op">:</span><span class="dv">2</span>], as.character)</code></pre>
+<pre><code>## $`1`
+## [1] &quot;Hope you are having a good week. Just checking in&quot;
+## 
+## $`2`
+## [1] &quot;K..give back my thanks.&quot;</code></pre>
+<ul>
+<li>clean up the corpus using tm_map()</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus, <span class="kw">content_transformer</span>(tolower))</code></pre>
+<ul>
+<li>show the difference between sms_corpus and corpus_clean</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">as.character</span>(sms_corpus[[<span class="dv">1</span>]])</code></pre>
+<pre><code>## [1] &quot;Hope you are having a good week. Just checking in&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">as.character</span>(sms_corpus_clean[[<span class="dv">1</span>]])</code></pre>
+<pre><code>## [1] &quot;hope you are having a good week. just checking in&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus_clean, removeNumbers) <span class="co"># remove numbers</span>
+sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus_clean, removeWords, <span class="kw">stopwords</span>()) <span class="co"># remove stop words</span>
+sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus_clean, removePunctuation) <span class="co"># remove punctuation</span></code></pre>
+<ul>
+<li>tip: create a custom function to replace (rather than remove) punctuation</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">removePunctuation</span>(<span class="st">&quot;hello...world&quot;</span>)</code></pre>
+<pre><code>## [1] &quot;helloworld&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">replacePunctuation &lt;-<span class="st"> </span><span class="cf">function</span>(x) { <span class="kw">gsub</span>(<span class="st">&quot;[[:punct:]]+&quot;</span>, <span class="st">&quot; &quot;</span>, x) }
+<span class="kw">replacePunctuation</span>(<span class="st">&quot;hello...world&quot;</span>)</code></pre>
+<pre><code>## [1] &quot;hello world&quot;</code></pre>
+<ul>
+<li>illustration of word stemming</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">wordStem</span>(<span class="kw">c</span>(<span class="st">&quot;learn&quot;</span>, <span class="st">&quot;learned&quot;</span>, <span class="st">&quot;learning&quot;</span>, <span class="st">&quot;learns&quot;</span>))</code></pre>
+<pre><code>## [1] &quot;learn&quot; &quot;learn&quot; &quot;learn&quot; &quot;learn&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus_clean, stemDocument)
+sms_corpus_clean &lt;-<span class="st"> </span><span class="kw">tm_map</span>(sms_corpus_clean, stripWhitespace) <span class="co"># eliminate unneeded whitespace</span></code></pre>
+<ul>
+<li>examine the final clean corpus</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(sms_corpus[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>], as.character)</code></pre>
+<pre><code>## $`1`
+## [1] &quot;Hope you are having a good week. Just checking in&quot;
+## 
+## $`2`
+## [1] &quot;K..give back my thanks.&quot;
+## 
+## $`3`
+## [1] &quot;Am also doing in cbe only. But have to pay.&quot;</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">lapply</span>(sms_corpus_clean[<span class="dv">1</span><span class="op">:</span><span class="dv">3</span>], as.character)</code></pre>
+<pre><code>## $`1`
+## [1] &quot;hope good week just check&quot;
+## 
+## $`2`
+## [1] &quot;kgive back thank&quot;
+## 
+## $`3`
+## [1] &quot;also cbe pay&quot;</code></pre>
+<ul>
+<li>create a document-term sparse matrix</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_dtm &lt;-<span class="st"> </span><span class="kw">DocumentTermMatrix</span>(sms_corpus_clean)</code></pre>
+<ul>
+<li>alternative solution: create a document-term sparse matrix directly from the SMS corpus</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_dtm2 &lt;-<span class="st"> </span><span class="kw">DocumentTermMatrix</span>(sms_corpus, <span class="dt">control =</span> <span class="kw">list</span>(
+  <span class="dt">tolower =</span> <span class="ot">TRUE</span>,
+  <span class="dt">removeNumbers =</span> <span class="ot">TRUE</span>,
+  <span class="dt">stopwords =</span> <span class="ot">TRUE</span>,
+  <span class="dt">removePunctuation =</span> <span class="ot">TRUE</span>,
+  <span class="dt">stemming =</span> <span class="ot">TRUE</span>
+))</code></pre>
+<ul>
+<li>alternative solution: using custom stop words function ensures identical result</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_dtm3 &lt;-<span class="st"> </span><span class="kw">DocumentTermMatrix</span>(sms_corpus, <span class="dt">control =</span> <span class="kw">list</span>(
+  <span class="dt">tolower =</span> <span class="ot">TRUE</span>,
+  <span class="dt">removeNumbers =</span> <span class="ot">TRUE</span>,
+  <span class="dt">stopwords =</span> <span class="cf">function</span>(x) { <span class="kw">removeWords</span>(x, <span class="kw">stopwords</span>()) },
+  <span class="dt">removePunctuation =</span> <span class="ot">TRUE</span>,
+  <span class="dt">stemming =</span> <span class="ot">TRUE</span>
+))</code></pre>
+<ul>
+<li>compare the result</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_dtm</code></pre>
+<pre><code>## &lt;&lt;DocumentTermMatrix (documents: 5559, terms: 6559)&gt;&gt;
+## Non-/sparse entries: 42147/36419334
+## Sparsity           : 100%
+## Maximal term length: 40
+## Weighting          : term frequency (tf)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">sms_dtm2</code></pre>
+<pre><code>## &lt;&lt;DocumentTermMatrix (documents: 5559, terms: 6961)&gt;&gt;
+## Non-/sparse entries: 43221/38652978
+## Sparsity           : 100%
+## Maximal term length: 40
+## Weighting          : term frequency (tf)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">sms_dtm3</code></pre>
+<pre><code>## &lt;&lt;DocumentTermMatrix (documents: 5559, terms: 6559)&gt;&gt;
+## Non-/sparse entries: 42147/36419334
+## Sparsity           : 100%
+## Maximal term length: 40
+## Weighting          : term frequency (tf)</code></pre>
+<ul>
+<li>creating training and test datasets</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_dtm_train &lt;-<span class="st"> </span>sms_dtm[<span class="dv">1</span><span class="op">:</span><span class="dv">4169</span>, ]
+sms_dtm_test  &lt;-<span class="st"> </span>sms_dtm[<span class="dv">4170</span><span class="op">:</span><span class="dv">5559</span>, ]</code></pre>
+<ul>
+<li>also save the labels</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_train_labels &lt;-<span class="st"> </span>sms_raw[<span class="dv">1</span><span class="op">:</span><span class="dv">4169</span>, ]<span class="op">$</span>type
+sms_test_labels  &lt;-<span class="st"> </span>sms_raw[<span class="dv">4170</span><span class="op">:</span><span class="dv">5559</span>, ]<span class="op">$</span>type</code></pre>
+<ul>
+<li>check that the proportion of spam is similar</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(<span class="kw">table</span>(sms_train_labels))</code></pre>
+<pre><code>## sms_train_labels
+##       ham      spam 
+## 0.8647158 0.1352842</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">prop.table</span>(<span class="kw">table</span>(sms_test_labels))</code></pre>
+<pre><code>## sms_test_labels
+##       ham      spam 
+## 0.8683453 0.1316547</code></pre>
+<ul>
+<li>word cloud visualization</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">wordcloud</span>(sms_corpus_clean, <span class="dt">min.freq =</span> <span class="dv">50</span>, <span class="dt">random.order =</span> <span class="ot">FALSE</span>)</code></pre>
+<p><img src="Chapter04_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<ul>
+<li>subset the training data into spam and ham groups</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">spam &lt;-<span class="st"> </span><span class="kw">subset</span>(sms_raw, type <span class="op">==</span><span class="st"> &quot;spam&quot;</span>)
+ham  &lt;-<span class="st"> </span><span class="kw">subset</span>(sms_raw, type <span class="op">==</span><span class="st"> &quot;ham&quot;</span>)
+<span class="kw">wordcloud</span>(spam<span class="op">$</span>text, <span class="dt">max.words =</span> <span class="dv">40</span>, <span class="dt">scale =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="fl">0.5</span>))</code></pre>
+<pre><code>## Warning in tm_map.SimpleCorpus(corpus, tm::removePunctuation):
+## transformation drops documents</code></pre>
+<pre><code>## Warning in tm_map.SimpleCorpus(corpus, function(x) tm::removeWords(x,
+## tm::stopwords())): transformation drops documents</code></pre>
+<p><img src="Chapter04_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">wordcloud</span>(ham<span class="op">$</span>text, <span class="dt">max.words =</span> <span class="dv">40</span>, <span class="dt">scale =</span> <span class="kw">c</span>(<span class="dv">3</span>, <span class="fl">0.5</span>))</code></pre>
+<pre><code>## Warning in tm_map.SimpleCorpus(corpus, tm::removePunctuation):
+## transformation drops documents
+
+## Warning in tm_map.SimpleCorpus(corpus, tm::removePunctuation):
+## transformation drops documents</code></pre>
+<p><img src="Chapter04_files/figure-html/unnamed-chunk-20-2.png" width="672" /></p>
+<pre class="sourceCode r"><code class="sourceCode r">sms_dtm_freq_train &lt;-<span class="st"> </span><span class="kw">removeSparseTerms</span>(sms_dtm_train, <span class="fl">0.999</span>)
+sms_dtm_freq_train</code></pre>
+<pre><code>## &lt;&lt;DocumentTermMatrix (documents: 4169, terms: 1104)&gt;&gt;
+## Non-/sparse entries: 24827/4577749
+## Sparsity           : 99%
+## Maximal term length: 19
+## Weighting          : term frequency (tf)</code></pre>
+<ul>
+<li>indicator features for frequent words</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">findFreqTerms</span>(sms_dtm_train, <span class="dv">5</span>)</code></pre>
+<pre><code>##    [1] &quot;£wk&quot;                 &quot;€˜m&quot;                 &quot;€˜s&quot;                
+##    [4] &quot;abiola&quot;              &quot;abl&quot;                 &quot;abt&quot;                
+##    [7] &quot;accept&quot;              &quot;access&quot;              &quot;account&quot;            
+##   [10] &quot;across&quot;              &quot;act&quot;                 &quot;activ&quot;              
+##   [13] &quot;actual&quot;              &quot;add&quot;                 &quot;address&quot;            
+##   [16] &quot;admir&quot;               &quot;adult&quot;               &quot;advanc&quot;             
+##   [19] &quot;aft&quot;                 &quot;afternoon&quot;           &quot;age&quot;                
+##   [22] &quot;ago&quot;                 &quot;aha&quot;                 &quot;ahead&quot;              
+##   [25] &quot;aight&quot;               &quot;aint&quot;                &quot;air&quot;                
+##   [28] &quot;aiyo&quot;                &quot;alex&quot;                &quot;almost&quot;             
+##   [31] &quot;alon&quot;                &quot;alreadi&quot;             &quot;alright&quot;            
+##   [34] &quot;also&quot;                &quot;alway&quot;               &quot;angri&quot;              
+##   [37] &quot;announc&quot;             &quot;anoth&quot;               &quot;answer&quot;             
+##   [40] &quot;anymor&quot;              &quot;anyon&quot;               &quot;anyth&quot;              
+##   [43] &quot;anytim&quot;              &quot;anyway&quot;              &quot;apart&quot;              
+##   [46] &quot;app&quot;                 &quot;appli&quot;               &quot;appreci&quot;            
+##   [49] &quot;arcad&quot;               &quot;ard&quot;                 &quot;area&quot;               
+##   [52] &quot;argu&quot;                &quot;argument&quot;            &quot;armand&quot;             
+##   [55] &quot;around&quot;              &quot;arrang&quot;              &quot;arriv&quot;              
+##   [58] &quot;asap&quot;                &quot;ask&quot;                 &quot;askd&quot;               
+##   [61] &quot;attempt&quot;             &quot;auction&quot;             &quot;avail&quot;              
+##   [64] &quot;ave&quot;                 &quot;avoid&quot;               &quot;await&quot;              
+##   [67] &quot;awak&quot;                &quot;award&quot;               &quot;away&quot;               
+##   [70] &quot;awesom&quot;              &quot;babe&quot;                &quot;babi&quot;               
+##   [73] &quot;back&quot;                &quot;bad&quot;                 &quot;bag&quot;                
+##   [76] &quot;bank&quot;                &quot;bare&quot;                &quot;basic&quot;              
+##   [79] &quot;bath&quot;                &quot;batteri&quot;             &quot;bcoz&quot;               
+##   [82] &quot;bday&quot;                &quot;beauti&quot;              &quot;becom&quot;              
+##   [85] &quot;bed&quot;                 &quot;bedroom&quot;             &quot;beer&quot;               
+##   [88] &quot;begin&quot;               &quot;believ&quot;              &quot;best&quot;               
+##   [91] &quot;better&quot;              &quot;bid&quot;                 &quot;big&quot;                
+##   [94] &quot;bill&quot;                &quot;bird&quot;                &quot;birthday&quot;           
+##   [97] &quot;bit&quot;                 &quot;black&quot;               &quot;blank&quot;              
+##  [100] &quot;bless&quot;               &quot;blue&quot;                &quot;bluetooth&quot;          
+##  [103] &quot;bold&quot;                &quot;bonus&quot;               &quot;boo&quot;                
+##  [106] &quot;book&quot;                &quot;boost&quot;               &quot;bore&quot;               
+##  [109] &quot;boss&quot;                &quot;bother&quot;              &quot;bout&quot;               
+##  [112] &quot;box&quot;                 &quot;boy&quot;                 &quot;boytoy&quot;             
+##  [115] &quot;break&quot;               &quot;breath&quot;              &quot;bring&quot;              
+##  [118] &quot;brother&quot;             &quot;bslvyl&quot;              &quot;btnationalr&quot;        
+##  [121] &quot;buck&quot;                &quot;bus&quot;                 &quot;busi&quot;               
+##  [124] &quot;buy&quot;                 &quot;cabin&quot;               &quot;call&quot;               
+##  [127] &quot;caller&quot;              &quot;callertun&quot;           &quot;camcord&quot;            
+##  [130] &quot;came&quot;                &quot;camera&quot;              &quot;campus&quot;             
+##  [133] &quot;can&quot;                 &quot;cancel&quot;              &quot;cancer&quot;             
+##  [136] &quot;cant&quot;                &quot;car&quot;                 &quot;card&quot;               
+##  [139] &quot;care&quot;                &quot;carlo&quot;               &quot;case&quot;               
+##  [142] &quot;cash&quot;                &quot;cashbal&quot;             &quot;catch&quot;              
+##  [145] &quot;caus&quot;                &quot;celebr&quot;              &quot;cell&quot;               
+##  [148] &quot;centr&quot;               &quot;chanc&quot;               &quot;chang&quot;              
+##  [151] &quot;charg&quot;               &quot;chat&quot;                &quot;cheap&quot;              
+##  [154] &quot;cheaper&quot;             &quot;check&quot;               &quot;cheer&quot;              
+##  [157] &quot;chennai&quot;             &quot;chikku&quot;              &quot;childish&quot;           
+##  [160] &quot;children&quot;            &quot;choic&quot;               &quot;choos&quot;              
+##  [163] &quot;christma&quot;            &quot;claim&quot;               &quot;class&quot;              
+##  [166] &quot;clean&quot;               &quot;clear&quot;               &quot;close&quot;              
+##  [169] &quot;club&quot;                &quot;code&quot;                &quot;coffe&quot;              
+##  [172] &quot;cold&quot;                &quot;colleagu&quot;            &quot;collect&quot;            
+##  [175] &quot;colleg&quot;              &quot;colour&quot;              &quot;come&quot;               
+##  [178] &quot;comin&quot;               &quot;comp&quot;                &quot;compani&quot;            
+##  [181] &quot;competit&quot;            &quot;complet&quot;             &quot;complimentari&quot;      
+##  [184] &quot;comput&quot;              &quot;condit&quot;              &quot;confirm&quot;            
+##  [187] &quot;congrat&quot;             &quot;congratul&quot;           &quot;connect&quot;            
+##  [190] &quot;contact&quot;             &quot;content&quot;             &quot;contract&quot;           
+##  [193] &quot;cook&quot;                &quot;cool&quot;                &quot;copi&quot;               
+##  [196] &quot;correct&quot;             &quot;cos&quot;                 &quot;cost&quot;               
+##  [199] &quot;cost£pm&quot;             &quot;costa&quot;               &quot;coupl&quot;              
+##  [202] &quot;cours&quot;               &quot;cover&quot;               &quot;coz&quot;                
+##  [205] &quot;crave&quot;               &quot;crazi&quot;               &quot;creat&quot;              
+##  [208] &quot;credit&quot;              &quot;cri&quot;                 &quot;cross&quot;              
+##  [211] &quot;cuddl&quot;               &quot;cum&quot;                 &quot;cup&quot;                
+##  [214] &quot;current&quot;             &quot;custcar&quot;             &quot;custom&quot;             
+##  [217] &quot;cut&quot;                 &quot;cute&quot;                &quot;cuz&quot;                
+##  [220] &quot;dad&quot;                 &quot;daddi&quot;               &quot;darl&quot;               
+##  [223] &quot;darlin&quot;              &quot;darren&quot;              &quot;dat&quot;                
+##  [226] &quot;date&quot;                &quot;day&quot;                 &quot;dead&quot;               
+##  [229] &quot;deal&quot;                &quot;dear&quot;                &quot;decid&quot;              
+##  [232] &quot;decim&quot;               &quot;decis&quot;               &quot;deep&quot;               
+##  [235] &quot;definit&quot;             &quot;del&quot;                 &quot;deliv&quot;              
+##  [238] &quot;deliveri&quot;            &quot;den&quot;                 &quot;depend&quot;             
+##  [241] &quot;detail&quot;              &quot;didnt&quot;               &quot;die&quot;                
+##  [244] &quot;diet&quot;                &quot;differ&quot;              &quot;difficult&quot;          
+##  [247] &quot;digit&quot;               &quot;din&quot;                 &quot;dinner&quot;             
+##  [250] &quot;direct&quot;              &quot;dis&quot;                 &quot;discount&quot;           
+##  [253] &quot;discuss&quot;             &quot;disturb&quot;             &quot;dnt&quot;                
+##  [256] &quot;doc&quot;                 &quot;doctor&quot;              &quot;doesnt&quot;             
+##  [259] &quot;dog&quot;                 &quot;doin&quot;                &quot;don&quot;                
+##  [262] &quot;done&quot;                &quot;dont&quot;                &quot;door&quot;               
+##  [265] &quot;doubl&quot;               &quot;download&quot;            &quot;draw&quot;               
+##  [268] &quot;dream&quot;               &quot;drink&quot;               &quot;drive&quot;              
+##  [271] &quot;drop&quot;                &quot;drug&quot;                &quot;dude&quot;               
+##  [274] &quot;due&quot;                 &quot;dun&quot;                 &quot;dunno&quot;              
+##  [277] &quot;dvd&quot;                 &quot;earli&quot;               &quot;earlier&quot;            
+##  [280] &quot;earth&quot;               &quot;easi&quot;                &quot;eat&quot;                
+##  [283] &quot;eatin&quot;               &quot;egg&quot;                 &quot;either&quot;             
+##  [286] &quot;els&quot;                 &quot;email&quot;               &quot;embarass&quot;           
+##  [289] &quot;end&quot;                 &quot;energi&quot;              &quot;england&quot;            
+##  [292] &quot;enjoy&quot;               &quot;enough&quot;              &quot;enter&quot;              
+##  [295] &quot;entitl&quot;              &quot;entri&quot;               &quot;envelop&quot;            
+##  [298] &quot;etc&quot;                 &quot;euro&quot;                &quot;eve&quot;                
+##  [301] &quot;even&quot;                &quot;ever&quot;                &quot;everi&quot;              
+##  [304] &quot;everybodi&quot;           &quot;everyon&quot;             &quot;everyth&quot;            
+##  [307] &quot;exact&quot;               &quot;exam&quot;                &quot;excel&quot;              
+##  [310] &quot;excit&quot;               &quot;excus&quot;               &quot;expect&quot;             
+##  [313] &quot;experi&quot;              &quot;expir&quot;               &quot;extra&quot;              
+##  [316] &quot;eye&quot;                 &quot;face&quot;                &quot;facebook&quot;           
+##  [319] &quot;fact&quot;                &quot;fall&quot;                &quot;famili&quot;             
+##  [322] &quot;fanci&quot;               &quot;fantasi&quot;             &quot;fantast&quot;            
+##  [325] &quot;far&quot;                 &quot;fast&quot;                &quot;fat&quot;                
+##  [328] &quot;father&quot;              &quot;fault&quot;               &quot;feb&quot;                
+##  [331] &quot;feel&quot;                &quot;felt&quot;                &quot;fetch&quot;              
+##  [334] &quot;fight&quot;               &quot;figur&quot;               &quot;file&quot;               
+##  [337] &quot;fill&quot;                &quot;film&quot;                &quot;final&quot;              
+##  [340] &quot;find&quot;                &quot;fine&quot;                &quot;finger&quot;             
+##  [343] &quot;finish&quot;              &quot;first&quot;               &quot;fix&quot;                
+##  [346] &quot;flag&quot;                &quot;flat&quot;                &quot;flight&quot;             
+##  [349] &quot;flower&quot;              &quot;follow&quot;              &quot;fone&quot;               
+##  [352] &quot;food&quot;                &quot;forev&quot;               &quot;forget&quot;             
+##  [355] &quot;forgot&quot;              &quot;forward&quot;             &quot;found&quot;              
+##  [358] &quot;freak&quot;               &quot;free&quot;                &quot;freemsg&quot;            
+##  [361] &quot;freephon&quot;            &quot;fren&quot;                &quot;fri&quot;                
+##  [364] &quot;friday&quot;              &quot;friend&quot;              &quot;friendship&quot;         
+##  [367] &quot;frm&quot;                 &quot;frnd&quot;                &quot;frnds&quot;              
+##  [370] &quot;full&quot;                &quot;fullonsmscom&quot;        &quot;fun&quot;                
+##  [373] &quot;funni&quot;               &quot;futur&quot;               &quot;gal&quot;                
+##  [376] &quot;game&quot;                &quot;gap&quot;                 &quot;gas&quot;                
+##  [379] &quot;gave&quot;                &quot;gay&quot;                 &quot;gentl&quot;              
+##  [382] &quot;get&quot;                 &quot;gettin&quot;              &quot;gift&quot;               
+##  [385] &quot;girl&quot;                &quot;girlfrnd&quot;            &quot;give&quot;               
+##  [388] &quot;glad&quot;                &quot;god&quot;                 &quot;goe&quot;                
+##  [391] &quot;goin&quot;                &quot;gone&quot;                &quot;gonna&quot;              
+##  [394] &quot;good&quot;                &quot;goodmorn&quot;            &quot;goodnight&quot;          
+##  [397] &quot;got&quot;                 &quot;goto&quot;                &quot;gotta&quot;              
+##  [400] &quot;great&quot;               &quot;grin&quot;                &quot;guarante&quot;           
+##  [403] &quot;gud&quot;                 &quot;guess&quot;               &quot;guy&quot;                
+##  [406] &quot;gym&quot;                 &quot;haf&quot;                 &quot;haha&quot;               
+##  [409] &quot;hai&quot;                 &quot;hair&quot;                &quot;half&quot;               
+##  [412] &quot;hand&quot;                &quot;handset&quot;             &quot;hang&quot;               
+##  [415] &quot;happen&quot;              &quot;happi&quot;               &quot;hard&quot;               
+##  [418] &quot;hate&quot;                &quot;hav&quot;                 &quot;havent&quot;             
+##  [421] &quot;head&quot;                &quot;hear&quot;                &quot;heard&quot;              
+##  [424] &quot;heart&quot;               &quot;heavi&quot;               &quot;hee&quot;                
+##  [427] &quot;hell&quot;                &quot;hello&quot;               &quot;help&quot;               
+##  [430] &quot;hey&quot;                 &quot;hgsuiteland&quot;         &quot;hit&quot;                
+##  [433] &quot;hiya&quot;                &quot;hmm&quot;                 &quot;hmmm&quot;               
+##  [436] &quot;hmv&quot;                 &quot;hol&quot;                 &quot;hold&quot;               
+##  [439] &quot;holder&quot;              &quot;holiday&quot;             &quot;home&quot;               
+##  [442] &quot;hook&quot;                &quot;hop&quot;                 &quot;hope&quot;               
+##  [445] &quot;horni&quot;               &quot;hospit&quot;              &quot;hot&quot;                
+##  [448] &quot;hotel&quot;               &quot;hour&quot;                &quot;hous&quot;               
+##  [451] &quot;how&quot;                 &quot;howev&quot;               &quot;howz&quot;               
+##  [454] &quot;hrs&quot;                 &quot;httpwwwurawinnercom&quot; &quot;hug&quot;                
+##  [457] &quot;huh&quot;                 &quot;hungri&quot;              &quot;hurri&quot;              
+##  [460] &quot;hurt&quot;                &quot;ice&quot;                 &quot;idea&quot;               
+##  [463] &quot;identifi&quot;            &quot;ignor&quot;               &quot;ill&quot;                
+##  [466] &quot;immedi&quot;              &quot;import&quot;              &quot;inc&quot;                
+##  [469] &quot;includ&quot;              &quot;india&quot;               &quot;info&quot;               
+##  [472] &quot;inform&quot;              &quot;insid&quot;               &quot;instead&quot;            
+##  [475] &quot;interest&quot;            &quot;invit&quot;               &quot;ipod&quot;               
+##  [478] &quot;irrit&quot;               &quot;ish&quot;                 &quot;island&quot;             
+##  [481] &quot;issu&quot;                &quot;ive&quot;                 &quot;izzit&quot;              
+##  [484] &quot;januari&quot;             &quot;jay&quot;                 &quot;job&quot;                
+##  [487] &quot;john&quot;                &quot;join&quot;                &quot;joke&quot;               
+##  [490] &quot;joy&quot;                 &quot;jst&quot;                 &quot;jus&quot;                
+##  [493] &quot;just&quot;                &quot;juz&quot;                 &quot;kate&quot;               
+##  [496] &quot;keep&quot;                &quot;kept&quot;                &quot;kick&quot;               
+##  [499] &quot;kid&quot;                 &quot;kill&quot;                &quot;kind&quot;               
+##  [502] &quot;kinda&quot;               &quot;king&quot;                &quot;kiss&quot;               
+##  [505] &quot;knew&quot;                &quot;know&quot;                &quot;knw&quot;                
+##  [508] &quot;ladi&quot;                &quot;land&quot;                &quot;landlin&quot;            
+##  [511] &quot;laptop&quot;              &quot;lar&quot;                 &quot;last&quot;               
+##  [514] &quot;late&quot;                &quot;later&quot;               &quot;latest&quot;             
+##  [517] &quot;laugh&quot;               &quot;lazi&quot;                &quot;ldn&quot;                
+##  [520] &quot;lead&quot;                &quot;learn&quot;               &quot;least&quot;              
+##  [523] &quot;leav&quot;                &quot;lect&quot;                &quot;left&quot;               
+##  [526] &quot;leh&quot;                 &quot;lei&quot;                 &quot;less&quot;               
+##  [529] &quot;lesson&quot;              &quot;let&quot;                 &quot;letter&quot;             
+##  [532] &quot;liao&quot;                &quot;librari&quot;             &quot;lie&quot;                
+##  [535] &quot;life&quot;                &quot;lift&quot;                &quot;light&quot;              
+##  [538] &quot;like&quot;                &quot;line&quot;                &quot;link&quot;               
+##  [541] &quot;list&quot;                &quot;listen&quot;              &quot;littl&quot;              
+##  [544] &quot;live&quot;                &quot;lmao&quot;                &quot;load&quot;               
+##  [547] &quot;loan&quot;                &quot;local&quot;               &quot;locat&quot;              
+##  [550] &quot;log&quot;                 &quot;lol&quot;                 &quot;london&quot;             
+##  [553] &quot;long&quot;                &quot;longer&quot;              &quot;look&quot;               
+##  [556] &quot;lookin&quot;              &quot;lor&quot;                 &quot;lose&quot;               
+##  [559] &quot;lost&quot;                &quot;lot&quot;                 &quot;lovabl&quot;             
+##  [562] &quot;love&quot;                &quot;lover&quot;               &quot;loyalti&quot;            
+##  [565] &quot;ltd&quot;                 &quot;luck&quot;                &quot;lucki&quot;              
+##  [568] &quot;lunch&quot;               &quot;luv&quot;                 &quot;mad&quot;                
+##  [571] &quot;made&quot;                &quot;mah&quot;                 &quot;mail&quot;               
+##  [574] &quot;make&quot;                &quot;malaria&quot;             &quot;man&quot;                
+##  [577] &quot;mani&quot;                &quot;march&quot;               &quot;mark&quot;               
+##  [580] &quot;marri&quot;               &quot;match&quot;               &quot;mate&quot;               
+##  [583] &quot;matter&quot;              &quot;maxim&quot;               &quot;maxmin&quot;             
+##  [586] &quot;may&quot;                 &quot;mayb&quot;                &quot;meal&quot;               
+##  [589] &quot;mean&quot;                &quot;meant&quot;               &quot;med&quot;                
+##  [592] &quot;medic&quot;               &quot;meet&quot;                &quot;meetin&quot;             
+##  [595] &quot;meh&quot;                 &quot;member&quot;              &quot;men&quot;                
+##  [598] &quot;merri&quot;               &quot;messag&quot;              &quot;met&quot;                
+##  [601] &quot;mid&quot;                 &quot;midnight&quot;            &quot;might&quot;              
+##  [604] &quot;min&quot;                 &quot;mind&quot;                &quot;mine&quot;               
+##  [607] &quot;minut&quot;               &quot;miracl&quot;              &quot;miss&quot;               
+##  [610] &quot;mistak&quot;              &quot;moan&quot;                &quot;mob&quot;                
+##  [613] &quot;mobil&quot;               &quot;mobileupd&quot;           &quot;mode&quot;               
+##  [616] &quot;mom&quot;                 &quot;moment&quot;              &quot;mon&quot;                
+##  [619] &quot;monday&quot;              &quot;money&quot;               &quot;month&quot;              
+##  [622] &quot;morn&quot;                &quot;mother&quot;              &quot;motorola&quot;           
+##  [625] &quot;move&quot;                &quot;movi&quot;                &quot;mrng&quot;               
+##  [628] &quot;mrt&quot;                 &quot;mrw&quot;                 &quot;msg&quot;                
+##  [631] &quot;msgs&quot;                &quot;mths&quot;                &quot;much&quot;               
+##  [634] &quot;mum&quot;                 &quot;murder&quot;              &quot;music&quot;              
+##  [637] &quot;must&quot;                &quot;muz&quot;                 &quot;nah&quot;                
+##  [640] &quot;nake&quot;                &quot;name&quot;                &quot;nation&quot;             
+##  [643] &quot;natur&quot;               &quot;naughti&quot;             &quot;near&quot;               
+##  [646] &quot;need&quot;                &quot;net&quot;                 &quot;network&quot;            
+##  [649] &quot;neva&quot;                &quot;never&quot;               &quot;new&quot;                
+##  [652] &quot;news&quot;                &quot;next&quot;                &quot;nice&quot;               
+##  [655] &quot;nigeria&quot;             &quot;night&quot;               &quot;nite&quot;               
+##  [658] &quot;nobodi&quot;              &quot;noe&quot;                 &quot;nokia&quot;              
+##  [661] &quot;noon&quot;                &quot;nope&quot;                &quot;normal&quot;             
+##  [664] &quot;normpton&quot;            &quot;noth&quot;                &quot;notic&quot;              
+##  [667] &quot;now&quot;                 &quot;num&quot;                 &quot;number&quot;             
+##  [670] &quot;nyt&quot;                 &quot;obvious&quot;             &quot;offer&quot;              
+##  [673] &quot;offic&quot;               &quot;offici&quot;              &quot;okay&quot;               
+##  [676] &quot;oki&quot;                 &quot;old&quot;                 &quot;omg&quot;                
+##  [679] &quot;one&quot;                 &quot;onlin&quot;               &quot;onto&quot;               
+##  [682] &quot;oop&quot;                 &quot;open&quot;                &quot;oper&quot;               
+##  [685] &quot;opinion&quot;             &quot;opt&quot;                 &quot;optout&quot;             
+##  [688] &quot;orang&quot;               &quot;orchard&quot;             &quot;order&quot;              
+##  [691] &quot;oredi&quot;               &quot;oso&quot;                 &quot;other&quot;              
+##  [694] &quot;otherwis&quot;            &quot;outsid&quot;              &quot;pack&quot;               
+##  [697] &quot;page&quot;                &quot;paid&quot;                &quot;pain&quot;               
+##  [700] &quot;paper&quot;               &quot;parent&quot;              &quot;park&quot;               
+##  [703] &quot;part&quot;                &quot;parti&quot;               &quot;partner&quot;            
+##  [706] &quot;pass&quot;                &quot;passion&quot;             &quot;password&quot;           
+##  [709] &quot;past&quot;                &quot;pay&quot;                 &quot;peopl&quot;              
+##  [712] &quot;per&quot;                 &quot;person&quot;              &quot;pete&quot;               
+##  [715] &quot;phone&quot;               &quot;photo&quot;               &quot;pic&quot;                
+##  [718] &quot;pick&quot;                &quot;pictur&quot;              &quot;pin&quot;                
+##  [721] &quot;piss&quot;                &quot;pix&quot;                 &quot;pizza&quot;              
+##  [724] &quot;place&quot;               &quot;plan&quot;                &quot;play&quot;               
+##  [727] &quot;player&quot;              &quot;pleas&quot;               &quot;pleasur&quot;            
+##  [730] &quot;plenti&quot;              &quot;pls&quot;                 &quot;plus&quot;               
+##  [733] &quot;plz&quot;                 &quot;pmin&quot;                &quot;pmsg&quot;               
+##  [736] &quot;pobox&quot;               &quot;point&quot;               &quot;poli&quot;               
+##  [739] &quot;polic&quot;               &quot;poor&quot;                &quot;pop&quot;                
+##  [742] &quot;possess&quot;             &quot;possibl&quot;             &quot;post&quot;               
+##  [745] &quot;pound&quot;               &quot;power&quot;               &quot;ppm&quot;                
+##  [748] &quot;pray&quot;                &quot;present&quot;             &quot;press&quot;              
+##  [751] &quot;pretti&quot;              &quot;previous&quot;            &quot;price&quot;              
+##  [754] &quot;princess&quot;            &quot;privat&quot;              &quot;prize&quot;              
+##  [757] &quot;prob&quot;                &quot;probabl&quot;             &quot;problem&quot;            
+##  [760] &quot;project&quot;             &quot;promis&quot;              &quot;pub&quot;                
+##  [763] &quot;put&quot;                 &quot;qualiti&quot;             &quot;question&quot;           
+##  [766] &quot;quick&quot;               &quot;quit&quot;                &quot;quiz&quot;               
+##  [769] &quot;quot&quot;                &quot;rain&quot;                &quot;random&quot;             
+##  [772] &quot;rang&quot;                &quot;rate&quot;                &quot;rather&quot;             
+##  [775] &quot;rcvd&quot;                &quot;reach&quot;               &quot;read&quot;               
+##  [778] &quot;readi&quot;               &quot;real&quot;                &quot;reali&quot;              
+##  [781] &quot;realli&quot;              &quot;reason&quot;              &quot;receipt&quot;            
+##  [784] &quot;receiv&quot;              &quot;recent&quot;              &quot;record&quot;             
+##  [787] &quot;refer&quot;               &quot;regard&quot;              &quot;regist&quot;             
+##  [790] &quot;relat&quot;               &quot;relax&quot;               &quot;remain&quot;             
+##  [793] &quot;rememb&quot;              &quot;remind&quot;              &quot;remov&quot;              
+##  [796] &quot;rent&quot;                &quot;rental&quot;              &quot;repli&quot;              
+##  [799] &quot;repres&quot;              &quot;request&quot;             &quot;respond&quot;            
+##  [802] &quot;respons&quot;             &quot;rest&quot;                &quot;result&quot;             
+##  [805] &quot;return&quot;              &quot;reveal&quot;              &quot;review&quot;             
+##  [808] &quot;reward&quot;              &quot;right&quot;               &quot;ring&quot;               
+##  [811] &quot;rington&quot;             &quot;rite&quot;                &quot;road&quot;               
+##  [814] &quot;rock&quot;                &quot;role&quot;                &quot;room&quot;               
+##  [817] &quot;roommat&quot;             &quot;rose&quot;                &quot;round&quot;              
+##  [820] &quot;rowwjhl&quot;             &quot;rpli&quot;                &quot;rreveal&quot;            
+##  [823] &quot;run&quot;                 &quot;rush&quot;                &quot;sad&quot;                
+##  [826] &quot;sae&quot;                 &quot;safe&quot;                &quot;said&quot;               
+##  [829] &quot;sale&quot;                &quot;sat&quot;                 &quot;saturday&quot;           
+##  [832] &quot;savamob&quot;             &quot;save&quot;                &quot;saw&quot;                
+##  [835] &quot;say&quot;                 &quot;sch&quot;                 &quot;school&quot;             
+##  [838] &quot;scream&quot;              &quot;sea&quot;                 &quot;search&quot;             
+##  [841] &quot;sec&quot;                 &quot;second&quot;              &quot;secret&quot;             
+##  [844] &quot;see&quot;                 &quot;seem&quot;                &quot;seen&quot;               
+##  [847] &quot;select&quot;              &quot;self&quot;                &quot;sell&quot;               
+##  [850] &quot;semest&quot;              &quot;send&quot;                &quot;sens&quot;               
+##  [853] &quot;sent&quot;                &quot;serious&quot;             &quot;servic&quot;             
+##  [856] &quot;set&quot;                 &quot;settl&quot;               &quot;sex&quot;                
+##  [859] &quot;sexi&quot;                &quot;shall&quot;               &quot;share&quot;              
+##  [862] &quot;shd&quot;                 &quot;ship&quot;                &quot;shirt&quot;              
+##  [865] &quot;shop&quot;                &quot;short&quot;               &quot;show&quot;               
+##  [868] &quot;shower&quot;              &quot;sick&quot;                &quot;side&quot;               
+##  [871] &quot;sigh&quot;                &quot;sight&quot;               &quot;sign&quot;               
+##  [874] &quot;silent&quot;              &quot;simpl&quot;               &quot;sinc&quot;               
+##  [877] &quot;singl&quot;               &quot;sipix&quot;               &quot;sir&quot;                
+##  [880] &quot;sis&quot;                 &quot;sister&quot;              &quot;sit&quot;                
+##  [883] &quot;situat&quot;              &quot;skxh&quot;                &quot;skype&quot;              
+##  [886] &quot;slave&quot;               &quot;sleep&quot;               &quot;slept&quot;              
+##  [889] &quot;slow&quot;                &quot;slowli&quot;              &quot;small&quot;              
+##  [892] &quot;smile&quot;               &quot;smoke&quot;               &quot;sms&quot;                
+##  [895] &quot;smth&quot;                &quot;snow&quot;                &quot;sofa&quot;               
+##  [898] &quot;sol&quot;                 &quot;somebodi&quot;            &quot;someon&quot;             
+##  [901] &quot;someth&quot;              &quot;sometim&quot;             &quot;somewher&quot;           
+##  [904] &quot;song&quot;                &quot;soni&quot;                &quot;sonyericsson&quot;       
+##  [907] &quot;soon&quot;                &quot;sorri&quot;               &quot;sort&quot;               
+##  [910] &quot;sound&quot;               &quot;south&quot;               &quot;space&quot;              
+##  [913] &quot;speak&quot;               &quot;special&quot;             &quot;specialcal&quot;         
+##  [916] &quot;spend&quot;               &quot;spent&quot;               &quot;spoke&quot;              
+##  [919] &quot;spree&quot;               &quot;stand&quot;               &quot;start&quot;              
+##  [922] &quot;statement&quot;           &quot;station&quot;             &quot;stay&quot;               
+##  [925] &quot;std&quot;                 &quot;step&quot;                &quot;still&quot;              
+##  [928] &quot;stockport&quot;           &quot;stone&quot;               &quot;stop&quot;               
+##  [931] &quot;store&quot;               &quot;stori&quot;               &quot;street&quot;             
+##  [934] &quot;student&quot;             &quot;studi&quot;               &quot;stuff&quot;              
+##  [937] &quot;stupid&quot;              &quot;style&quot;               &quot;sub&quot;                
+##  [940] &quot;subscrib&quot;            &quot;success&quot;             &quot;suck&quot;               
+##  [943] &quot;suit&quot;                &quot;summer&quot;              &quot;sun&quot;                
+##  [946] &quot;sunday&quot;              &quot;sunshin&quot;             &quot;sup&quot;                
+##  [949] &quot;support&quot;             &quot;suppos&quot;              &quot;sure&quot;               
+##  [952] &quot;surf&quot;                &quot;surpris&quot;             &quot;sweet&quot;              
+##  [955] &quot;swing&quot;               &quot;system&quot;              &quot;take&quot;               
+##  [958] &quot;talk&quot;                &quot;tampa&quot;               &quot;tariff&quot;             
+##  [961] &quot;tcs&quot;                 &quot;tea&quot;                 &quot;teach&quot;              
+##  [964] &quot;tear&quot;                &quot;teas&quot;                &quot;tel&quot;                
+##  [967] &quot;tell&quot;                &quot;ten&quot;                 &quot;tenerif&quot;            
+##  [970] &quot;term&quot;                &quot;test&quot;                &quot;text&quot;               
+##  [973] &quot;thank&quot;               &quot;thanx&quot;               &quot;that&quot;               
+##  [976] &quot;thing&quot;               &quot;think&quot;               &quot;thinkin&quot;            
+##  [979] &quot;thk&quot;                 &quot;tho&quot;                 &quot;though&quot;             
+##  [982] &quot;thought&quot;             &quot;throw&quot;               &quot;thru&quot;               
+##  [985] &quot;tht&quot;                 &quot;thur&quot;                &quot;tick&quot;               
+##  [988] &quot;ticket&quot;              &quot;til&quot;                 &quot;till&quot;               
+##  [991] &quot;time&quot;                &quot;tire&quot;                &quot;titl&quot;               
+##  [994] &quot;tmr&quot;                 &quot;toclaim&quot;             &quot;today&quot;              
+##  [997] &quot;togeth&quot;              &quot;told&quot;                &quot;tomo&quot;               
+## [1000] &quot;tomorrow&quot;            &quot;tone&quot;                &quot;tonight&quot;            
+## [1003] &quot;tonit&quot;               &quot;took&quot;                &quot;top&quot;                
+## [1006] &quot;torch&quot;               &quot;tot&quot;                 &quot;total&quot;              
+## [1009] &quot;touch&quot;               &quot;tough&quot;               &quot;tour&quot;               
+## [1012] &quot;toward&quot;              &quot;town&quot;                &quot;track&quot;              
+## [1015] &quot;train&quot;               &quot;transact&quot;            &quot;travel&quot;             
+## [1018] &quot;treat&quot;               &quot;tri&quot;                 &quot;trip&quot;               
+## [1021] &quot;troubl&quot;              &quot;true&quot;                &quot;trust&quot;              
+## [1024] &quot;truth&quot;               &quot;tscs&quot;                &quot;ttyl&quot;               
+## [1027] &quot;tuesday&quot;             &quot;turn&quot;                &quot;twice&quot;              
+## [1030] &quot;two&quot;                 &quot;txt&quot;                 &quot;txting&quot;             
+## [1033] &quot;txts&quot;                &quot;type&quot;                &quot;ufind&quot;              
+## [1036] &quot;ugh&quot;                 &quot;ull&quot;                 &quot;uncl&quot;               
+## [1039] &quot;understand&quot;          &quot;unless&quot;              &quot;unlimit&quot;            
+## [1042] &quot;unredeem&quot;            &quot;unsub&quot;               &quot;unsubscrib&quot;         
+## [1045] &quot;updat&quot;               &quot;ure&quot;                 &quot;urgent&quot;             
+## [1048] &quot;urself&quot;              &quot;use&quot;                 &quot;user&quot;               
+## [1051] &quot;usf&quot;                 &quot;usual&quot;               &quot;uve&quot;                
+## [1054] &quot;valentin&quot;            &quot;valid&quot;               &quot;valu&quot;               
+## [1057] &quot;via&quot;                 &quot;video&quot;               &quot;vikki&quot;              
+## [1060] &quot;visit&quot;               &quot;vodafon&quot;             &quot;voic&quot;               
+## [1063] &quot;vomit&quot;               &quot;voucher&quot;             &quot;wait&quot;               
+## [1066] &quot;wake&quot;                &quot;walk&quot;                &quot;wan&quot;                
+## [1069] &quot;wana&quot;                &quot;wanna&quot;               &quot;want&quot;               
+## [1072] &quot;wap&quot;                 &quot;warm&quot;                &quot;wast&quot;               
+## [1075] &quot;wat&quot;                 &quot;watch&quot;               &quot;water&quot;              
+## [1078] &quot;way&quot;                 &quot;weak&quot;                &quot;wear&quot;               
+## [1081] &quot;weather&quot;             &quot;wed&quot;                 &quot;wednesday&quot;          
+## [1084] &quot;weed&quot;                &quot;week&quot;                &quot;weekend&quot;            
+## [1087] &quot;welcom&quot;              &quot;well&quot;                &quot;wen&quot;                
+## [1090] &quot;went&quot;                &quot;what&quot;                &quot;whatev&quot;             
+## [1093] &quot;whenev&quot;              &quot;whole&quot;               &quot;wid&quot;                
+## [1096] &quot;wif&quot;                 &quot;wife&quot;                &quot;wil&quot;                
+## [1099] &quot;will&quot;                &quot;win&quot;                 &quot;wine&quot;               
+## [1102] &quot;winner&quot;              &quot;wish&quot;                &quot;wit&quot;                
+## [1105] &quot;within&quot;              &quot;without&quot;             &quot;wiv&quot;                
+## [1108] &quot;wkli&quot;                &quot;wks&quot;                 &quot;wnt&quot;                
+## [1111] &quot;woke&quot;                &quot;won&quot;                 &quot;wonder&quot;             
+## [1114] &quot;wont&quot;                &quot;word&quot;                &quot;work&quot;               
+## [1117] &quot;workin&quot;              &quot;world&quot;               &quot;worri&quot;              
+## [1120] &quot;wors&quot;                &quot;worth&quot;               &quot;wot&quot;                
+## [1123] &quot;wow&quot;                 &quot;write&quot;               &quot;wrong&quot;              
+## [1126] &quot;wwq&quot;                 &quot;wwwgetzedcouk&quot;       &quot;xmas&quot;               
+## [1129] &quot;xxx&quot;                 &quot;yahoo&quot;               &quot;yar&quot;                
+## [1132] &quot;yeah&quot;                &quot;year&quot;                &quot;yep&quot;                
+## [1135] &quot;yes&quot;                 &quot;yesterday&quot;           &quot;yet&quot;                
+## [1138] &quot;yoga&quot;                &quot;yup&quot;</code></pre>
+<ul>
+<li>save frequently-appearing terms to a character vector</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_freq_words &lt;-<span class="st"> </span><span class="kw">findFreqTerms</span>(sms_dtm_train, <span class="dv">5</span>)
+<span class="kw">str</span>(sms_freq_words)</code></pre>
+<pre><code>##  chr [1:1139] &quot;£wk&quot; &quot;€˜m&quot; &quot;€˜s&quot; &quot;abiola&quot; &quot;abl&quot; &quot;abt&quot; &quot;accept&quot; &quot;access&quot; ...</code></pre>
+<ul>
+<li>create DTMs with only the frequent terms</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_dtm_freq_train &lt;-<span class="st"> </span>sms_dtm_train[ , sms_freq_words]
+sms_dtm_freq_test &lt;-<span class="st"> </span>sms_dtm_test[ , sms_freq_words]</code></pre>
+<ul>
+<li>convert counts to a factor</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">convert_counts &lt;-<span class="st"> </span><span class="cf">function</span>(x) {
+  x &lt;-<span class="st"> </span><span class="kw">ifelse</span>(x <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>, <span class="st">&quot;Yes&quot;</span>, <span class="st">&quot;No&quot;</span>)
+}</code></pre>
+<ul>
+<li>apply() convert_counts() to columns of train/test data</li>
+</ul>
+<pre class="sourceCode r"><code class="sourceCode r">sms_train &lt;-<span class="st"> </span><span class="kw">apply</span>(sms_dtm_freq_train, <span class="dt">MARGIN =</span> <span class="dv">2</span>, convert_counts)
+sms_test  &lt;-<span class="st"> </span><span class="kw">apply</span>(sms_dtm_freq_test, <span class="dt">MARGIN =</span> <span class="dv">2</span>, convert_counts)</code></pre>
+</div>
+<div id="step-3-training-a-model-on-the-data-1" class="section level3">
+<h3><span class="header-section-number">4.2.2</span> Step 3: Training a model on the data</h3>
+<pre class="sourceCode r"><code class="sourceCode r">sms_classifier &lt;-<span class="st"> </span><span class="kw">naiveBayes</span>(sms_train, sms_train_labels)</code></pre>
+</div>
+<div id="step-4-evaluating-model-performance-1" class="section level3">
+<h3><span class="header-section-number">4.2.3</span> Step 4: Evaluating model performance</h3>
+<pre class="sourceCode r"><code class="sourceCode r">sms_test_pred &lt;-<span class="st"> </span><span class="kw">predict</span>(sms_classifier, sms_test)
+
+<span class="kw">CrossTable</span>(sms_test_pred, sms_test_labels,
+           <span class="dt">prop.chisq =</span> <span class="ot">FALSE</span>, <span class="dt">prop.t =</span> <span class="ot">FALSE</span>, <span class="dt">prop.r =</span> <span class="ot">FALSE</span>,
+           <span class="dt">dnn =</span> <span class="kw">c</span>(<span class="st">&#39;predicted&#39;</span>, <span class="st">&#39;actual&#39;</span>))</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Col Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  1390 
+## 
+##  
+##              | actual 
+##    predicted |       ham |      spam | Row Total | 
+## -------------|-----------|-----------|-----------|
+##          ham |      1201 |        30 |      1231 | 
+##              |     0.995 |     0.164 |           | 
+## -------------|-----------|-----------|-----------|
+##         spam |         6 |       153 |       159 | 
+##              |     0.005 |     0.836 |           | 
+## -------------|-----------|-----------|-----------|
+## Column Total |      1207 |       183 |      1390 | 
+##              |     0.868 |     0.132 |           | 
+## -------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+</div>
+<div id="step-5-improving-model-performance-1" class="section level3">
+<h3><span class="header-section-number">4.2.4</span> Step 5: Improving model performance</h3>
+<pre class="sourceCode r"><code class="sourceCode r">sms_classifier2 &lt;-<span class="st"> </span><span class="kw">naiveBayes</span>(sms_train, sms_train_labels, <span class="dt">laplace =</span> <span class="dv">1</span>)
+sms_test_pred2 &lt;-<span class="st"> </span><span class="kw">predict</span>(sms_classifier2, sms_test)
+<span class="kw">CrossTable</span>(sms_test_pred2, sms_test_labels,
+           <span class="dt">prop.chisq =</span> <span class="ot">FALSE</span>, <span class="dt">prop.t =</span> <span class="ot">FALSE</span>, <span class="dt">prop.r =</span> <span class="ot">FALSE</span>,
+           <span class="dt">dnn =</span> <span class="kw">c</span>(<span class="st">&#39;predicted&#39;</span>, <span class="st">&#39;actual&#39;</span>))</code></pre>
+<pre><code>## 
+##  
+##    Cell Contents
+## |-------------------------|
+## |                       N |
+## |           N / Col Total |
+## |-------------------------|
+## 
+##  
+## Total Observations in Table:  1390 
+## 
+##  
+##              | actual 
+##    predicted |       ham |      spam | Row Total | 
+## -------------|-----------|-----------|-----------|
+##          ham |      1202 |        28 |      1230 | 
+##              |     0.996 |     0.153 |           | 
+## -------------|-----------|-----------|-----------|
+##         spam |         5 |       155 |       160 | 
+##              |     0.004 |     0.847 |           | 
+## -------------|-----------|-----------|-----------|
+## Column Total |      1207 |       183 |      1390 | 
+##              |     0.868 |     0.132 |           | 
+## -------------|-----------|-----------|-----------|
+## 
+## </code></pre>
+</div>
+</div>
+<div id="summary-1" class="section level2">
+<h2><span class="header-section-number">4.3</span> Summary</h2>
+<ul>
+<li>Naive Bayes algorithm constructs tables of probabilities that are used to estimate the likelihood that new examples belong to various classes</li>
+<li>probabilities are calculated using a formula known as Bayes’ theorem, which specifies how dependent events are related</li>
+<li>Bayes’ theorem can be computationally expensive</li>
+<li>simplified version that makes so-called “naive” assumptions about the independence of features is capable of handling extremely large datasets</li>
+<li>often used for text classification</li>
+</ul>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="classification-using-nearest-neighbors.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="classification-using-decision-trees-and-rules.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/mnblanco/MLR/edit/master/Chapter04.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"download": ["mlr.pdf", "mlr.epub"],
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
